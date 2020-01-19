@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>space.arim</groupId>
+		<artifactId>perms</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>perms-core</artifactId>
+	<name>ArimPerms-core</name>
+	<description>The main implementation of ArimPerms.</description>
+	
+	<dependencies>
+		<dependency>
+			<groupId>space.arim</groupId>
+			<artifactId>perms-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>space.arim</groupId>
+			<artifactId>arimapi-core</artifactId>
+		</dependency>
+	</dependencies>
+</project>
