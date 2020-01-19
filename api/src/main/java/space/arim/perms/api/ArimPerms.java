@@ -20,10 +20,16 @@ package space.arim.perms.api;
 
 import java.io.File;
 
-import space.arim.universal.util.lang.AutoClosable;
+import space.arim.universal.registry.UniversalRegistry;
 
-public interface ArimPerms extends AutoClosable {
+import space.arim.api.config.SimpleConfig;
 
+public interface ArimPerms extends Configurable {
+
+	default UniversalRegistry getRegistry() {
+		return UniversalRegistry.get();
+	}
+	
 	File getFolder();
 	
 	GroupManager groups();
@@ -31,5 +37,7 @@ public interface ArimPerms extends AutoClosable {
 	UserManager users();
 	
 	LogManager logs();
+	
+	SimpleConfig config();
 	
 }

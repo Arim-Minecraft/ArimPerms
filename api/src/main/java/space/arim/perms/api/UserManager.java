@@ -23,8 +23,9 @@ import java.util.UUID;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-public interface UserManager {
+public interface UserManager extends Configurable {
 
-	@Nullable Collection<String> getGroups(UUID player);
+	@Nullable
+	Collection<String> getGroups(UUID player);
 	
 }

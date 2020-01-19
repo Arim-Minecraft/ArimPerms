@@ -20,7 +20,7 @@ package space.arim.perms.api;
 
 import java.util.Collection;
 
-public interface GroupManager {
+public interface GroupManager extends Configurable {
 
 	Collection<Group> getGroups();
 	

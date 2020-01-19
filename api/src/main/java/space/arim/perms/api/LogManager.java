@@ -18,8 +18,10 @@
  */
 package space.arim.perms.api;
 
-public interface LogManager {
+public interface LogManager extends Configurable {
 
+	void verbose(String message);
+	
 	void info(String message);
 	
 	void warning(String message);
