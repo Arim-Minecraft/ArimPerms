@@ -27,6 +27,6 @@ public interface UserManager extends Configurable {
 	@Nullable
 	User getPossibleUser(String id);
 	
-	boolean combineUserInformation(User user);
+	boolean addUser(User user);
 	
 }

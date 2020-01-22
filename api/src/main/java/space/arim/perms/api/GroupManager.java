@@ -27,6 +27,6 @@ public interface GroupManager extends Configurable {
 	@Nullable
 	Group getPossibleGroup(String id);
 	
-	boolean combineGroupInformation(Group group);
+	boolean addGroup(Group group);
 	
 }
