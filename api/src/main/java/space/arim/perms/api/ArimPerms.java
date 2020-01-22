@@ -19,15 +19,28 @@
 package space.arim.perms.api;
 
 import java.io.File;
+import java.util.UUID;
+
+import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.config.SimpleConfig;
 
-public interface ArimPerms extends Configurable {
+public interface ArimPerms extends PermissionsPlugin, Configurable {
 
 	default UniversalRegistry getRegistry() {
 		return UniversalRegistry.get();
+	}
+	
+	@Override
+	default boolean userHasPermission(UUID player, String permission, @Nullable String world) {
+		return users().getUser(player.toString().replace("-", "")).hasPermission(permission, world);
+	}
+	
+	@Override
+	default boolean groupHasPermission(String group, String permission, @Nullable String world) {
+		return groups().getGroup(group).hasPermission(permission, world);
 	}
 	
 	File getFolder();
@@ -37,6 +50,8 @@ public interface ArimPerms extends Configurable {
 	UserManager users();
 	
 	LogManager logs();
+	
+	DataManager data();
 	
 	SimpleConfig config();
 	
