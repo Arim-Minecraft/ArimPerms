@@ -18,14 +18,15 @@
  */
 package space.arim.perms.api;
 
-import java.util.Collection;
-import java.util.UUID;
-
 import org.eclipse.jdt.annotation.Nullable;
 
 public interface UserManager extends Configurable {
 
+	User getUser(String id);
+	
 	@Nullable
-	Collection<String> getGroups(UUID player);
+	User getPossibleUser(String id);
+	
+	boolean combineUserInformation(User user);
 	
 }
