@@ -23,9 +23,5 @@
 			<groupId>space.arim</groupId>
 			<artifactId>perms-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>space.arim</groupId>
-			<artifactId>arimapi-core</artifactId>
-		</dependency>
 	</dependencies>
 </project>
