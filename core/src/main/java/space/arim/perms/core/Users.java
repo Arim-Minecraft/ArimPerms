@@ -46,8 +46,7 @@ public class Users implements UserManager {
 	
 	@Override
 	public boolean addUser(User user) {
-		users.put(user.getId(), user);
-		return true;
+		return users.put(user.getId(), user) != null;
 	}
 	
 	@Override

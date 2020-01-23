@@ -49,8 +49,7 @@ public class Groups implements GroupManager {
 	
 	@Override
 	public boolean addGroup(Group group) {
-		groups.put(group.getId(), group);
-		return true;
+		return groups.put(group.getId(), group) != null;
 	}
 	
 	@Override

@@ -20,13 +20,37 @@ package space.arim.perms.api;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+/**
+ * Maintains the central collection of groups
+ * 
+ * @author A248
+ *
+ */
 public interface GroupManager extends Configurable {
 	
+	/**
+	 * Gets a Group by id, creating a new group if the specified group is not tracked.
+	 * 
+	 * @param id the group's ID
+	 * @return a group, never <code>null</code>
+	 */
 	Group getGroup(String id);
 	
+	/**
+	 * Gets a possible group by id
+	 * 
+	 * @param id the group id
+	 * @return the group if the group is tracked, <code>null</code> otherwise
+	 */
 	@Nullable
 	Group getPossibleGroup(String id);
 	
+	/**
+	 * Adds a Group, overriding potential existing entires.
+	 * 
+	 * @param group the group to add
+	 * @return false if a group already existed with {@link Group#getId()}, true otherwise
+	 */
 	boolean addGroup(Group group);
 	
 }

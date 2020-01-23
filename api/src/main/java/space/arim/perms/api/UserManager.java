@@ -20,13 +20,37 @@ package space.arim.perms.api;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+/**
+ * Maintains the central collection of users
+ * 
+ * @author A248
+ *
+ */
 public interface UserManager extends Configurable {
 
+	/**
+	 * Gets a User by id, creating a new user if the specified user is not tracked.
+	 * 
+	 * @param id the user's ID
+	 * @return a user, never <code>null</code>
+	 */
 	User getUser(String id);
 	
+	/**
+	 * Gets a possible user by id
+	 * 
+	 * @param id the user id
+	 * @return the user if the user is tracked, <code>null</code> otherwise
+	 */
 	@Nullable
 	User getPossibleUser(String id);
 	
+	/**
+	 * Adds a User, overriding potential existing entires.
+	 * 
+	 * @param user the user to add
+	 * @return false if a user already existed with {@link User#getId()}, true otherwise
+	 */
 	boolean addUser(User user);
 	
 }
