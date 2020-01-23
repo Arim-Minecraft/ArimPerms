@@ -31,6 +31,7 @@ public class ArimPermsPlugin implements ArimPerms {
 	private final Groups groups;
 	private final Users users;
 	private final Logs logs;
+	private final Commands commands;
 	private final Data data;
 	private final Config config;
 	
@@ -39,6 +40,7 @@ public class ArimPermsPlugin implements ArimPerms {
 		groups = new Groups(this);
 		users = new Users(this);
 		logs = new Logs(this, logger);
+		commands = new Commands(this);
 		data = new Data(this);
 		config = new Config(this);
 	}
@@ -61,6 +63,11 @@ public class ArimPermsPlugin implements ArimPerms {
 	@Override
 	public Logs logs() {
 		return logs;
+	}
+	
+	@Override
+	public Commands commands() {
+		return commands;
 	}
 	
 	@Override
