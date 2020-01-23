@@ -38,8 +38,7 @@ public class Groups implements GroupManager {
 	
 	@Override
 	public Group getGroup(String id) {
-		groups.putIfAbsent(id, new GroupInfo(id));
-		return groups.get(id);
+		return groups.computeIfAbsent(id, (groupId) -> new GroupInfo(groupId));
 	}
 	
 	@Override

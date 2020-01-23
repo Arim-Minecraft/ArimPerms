@@ -36,8 +36,7 @@ public class Users implements UserManager {
 	
 	@Override
 	public User getUser(String id) {
-		users.putIfAbsent(id, new UserInfo(id));
-		return users.get(id);
+		return users.computeIfAbsent(id, (userId) -> new UserInfo(userId));
 	}
 	
 	@Override
