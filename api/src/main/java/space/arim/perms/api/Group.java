@@ -87,6 +87,13 @@ public interface Group {
 	Collection<Group> getEffectiveParents();
 	
 	/**
+	 * Returns all worlds tracked by this Group.
+	 * 
+	 * @return a collection of all worlds for which there are world specific permissions
+	 */
+	Collection<String> getWorlds();
+	
+	/**
 	 * Adds a permission to the group
 	 * 
 	 * @param permission the permission
@@ -104,6 +111,25 @@ public interface Group {
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	boolean addPermission(String permission, @Nullable String world);
+	
+	/**
+	 * Adds all permissions to the group with optional world
+	 * 
+	 * @param world the world
+	 * @param permissions the permissions
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	boolean addPermissions(@Nullable String world, Collection<String> permissions);
+	
+	/**
+	 * Adds all permissions to the group
+	 * 
+	 * @param world the world
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	default boolean addPermissions(Collection<String> permissions) {
+		return addPermissions(null, permissions);
+	}
 	
 	/**
 	 * Gets whether this group has a specific permission
