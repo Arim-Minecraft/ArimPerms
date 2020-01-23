@@ -51,6 +51,8 @@ public interface ArimPerms extends PermissionsPlugin, Configurable {
 	
 	LogManager logs();
 	
+	CommandManager commands();
+	
 	DataManager data();
 	
 	SimpleConfig config();
