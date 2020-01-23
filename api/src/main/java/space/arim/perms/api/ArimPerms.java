@@ -25,7 +25,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.registry.UniversalRegistry;
 
-import space.arim.api.config.SimpleConfig;
+import space.arim.api.config.SimpleConfigFramework;
 
 public interface ArimPerms extends PermissionsPlugin, Configurable {
 
@@ -55,11 +55,14 @@ public interface ArimPerms extends PermissionsPlugin, Configurable {
 	
 	DataManager data();
 	
-	SimpleConfig config();
+	SimpleConfigFramework config();
+	
+	SimpleConfigFramework messages();
 	
 	@Override
 	default void reload(boolean first) {
 		config().reload();
+		messages().reload();
 		logs().reload(first);
 		data().reload(first);
 		data().readyDb();
