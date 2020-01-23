@@ -30,4 +30,8 @@ public interface DataManager extends Configurable {
 	
 	void saveUsers(Collection<User> users);
 	
+	void readyDb();
+	
+	void closeDb();
+	
 }
