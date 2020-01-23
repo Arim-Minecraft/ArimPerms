@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.util.collections.ArraysUtil;
+import space.arim.universal.util.collections.CollectionsUtil;
 
 import space.arim.perms.api.Group;
 
@@ -56,24 +57,47 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public Collection<String> getPermissions(@Nullable String world) {
-		Set<String> perms = permissions.get(world);
-		return perms != null ? Collections.unmodifiableSet(perms) : Collections.emptySet();
+		return Collections.unmodifiableSet(permissions.getOrDefault(world, Collections.emptySet()));
 	}
 	
 	@Override
 	public Collection<Group> getEffectiveParents() {
-		return effective;
+		return effective != null ? effective : Collections.emptySet();
+	}
+	
+	@Override
+	public Collection<String> getWorlds() {
+		return Collections.unmodifiableSet(permissions.keySet());
+	}
+	
+	void setParents(Group[] parents) {
+		this.parents = parents;
+	}
+	
+	void setPermissions(@Nullable String world, Set<String> permissions) {
+		this.permissions.put(world, permissions);
 	}
 	
 	@Override
 	public boolean addPermission(String permission, @Nullable String world) {
-		permissions.putIfAbsent(world, ConcurrentHashMap.newKeySet());
+		permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
 		return permissions.get(world).add(permission);
 	}
 	
 	@Override
+	public boolean addPermissions(@Nullable String world, Collection<String> permissions) {
+		this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
+		return this.permissions.get(world).addAll(permissions);
+	}
+	
+	@Override
+	public boolean hasPermission(String permission, @Nullable String world) {
+		return CollectionsUtil.checkForAnyMatches(getPermissions(world), (checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
+	}
+	
+	@Override
 	public boolean removePermission(String permission, @Nullable String world) {
-		permissions.putIfAbsent(world, ConcurrentHashMap.newKeySet());
+		permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
 		return permissions.get(world).remove(permission);
 	}
 	
@@ -109,7 +133,9 @@ public class GroupInfo implements Group {
 			groups.add(parent);
 			addGroupsRecursive(groups, parent, 0);
 		}
-		effective = groups;
+		if (!groups.isEmpty()) {
+			effective = Collections.unmodifiableSet(groups);
+		}
 	}
 	
 	@Override

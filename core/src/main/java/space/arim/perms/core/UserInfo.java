@@ -27,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.util.collections.ArraysUtil;
+import space.arim.universal.util.collections.CollectionsUtil;
+
 import space.arim.perms.api.Group;
 import space.arim.perms.api.User;
 
@@ -57,6 +59,10 @@ public class UserInfo implements User {
 		return effective.getOrDefault(world, Collections.emptySet());
 	}
 	
+	void setGroups(Group[] groups) {
+		this.groups = groups;
+	}
+	
 	@Override
 	public boolean addGroup(Group group) {
 		Group[] previous = groups;
@@ -72,6 +78,11 @@ public class UserInfo implements User {
 	}
 	
 	@Override
+	public boolean hasPermission(String permission, @Nullable String world) {
+		return CollectionsUtil.checkForAnyMatches(getEffectivePermissions(world), (checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
+	}
+	
+	@Override
 	public void recalculate(@Nullable String world) {
 		Set<String> effective = new HashSet<String>();
 		for (Group group : getGroups()) {
@@ -79,7 +90,9 @@ public class UserInfo implements User {
 				effective.addAll(parent.getPermissions(world));
 			});
 		}
-		this.effective.put(world, Collections.unmodifiableSet(effective));
+		if (!effective.isEmpty()) {
+			this.effective.put(world, Collections.unmodifiableSet(effective));
+		}
 	}
 	
 	@Override
