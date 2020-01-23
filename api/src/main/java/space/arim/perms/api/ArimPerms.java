@@ -23,13 +23,14 @@ import java.util.UUID;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import space.arim.universal.registry.Registry;
 import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.config.SimpleConfigFramework;
 
 public interface ArimPerms extends PermissionsPlugin, Configurable {
 
-	default UniversalRegistry getRegistry() {
+	default Registry getRegistry() {
 		return UniversalRegistry.get();
 	}
 	
