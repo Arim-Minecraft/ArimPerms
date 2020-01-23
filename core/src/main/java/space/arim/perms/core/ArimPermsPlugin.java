@@ -81,7 +81,7 @@ public class ArimPermsPlugin implements ArimPerms {
 	}
 	
 	static boolean matches(String permission, String checkPerm) {
-		return checkPerm.equalsIgnoreCase(permission) || checkPerm.equals("*") || checkPerm.endsWith(".*") && permission.startsWith(checkPerm.substring(0, checkPerm.lastIndexOf(".*")));
+		return checkPerm.equalsIgnoreCase(permission) || checkPerm.contains("*") && (checkPerm.equals("*") || checkPerm.endsWith(".*") && permission.startsWith(checkPerm.substring(0, checkPerm.lastIndexOf(".*"))));
 	}
 	
 }
