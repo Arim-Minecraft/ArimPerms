@@ -21,6 +21,8 @@ package space.arim.perms.core;
 import java.io.File;
 import java.util.logging.Logger;
 
+import space.arim.api.config.SimpleConfigFramework;
+
 import space.arim.perms.api.ArimPerms;
 
 public class ArimPermsPlugin implements ArimPerms {
@@ -34,6 +36,7 @@ public class ArimPermsPlugin implements ArimPerms {
 	private final Commands commands;
 	private final Data data;
 	private final Config config;
+	private final Messages messages;
 	
 	public ArimPermsPlugin(File folder, Logger logger) {
 		this.folder = folder;
@@ -43,6 +46,7 @@ public class ArimPermsPlugin implements ArimPerms {
 		commands = new Commands(this);
 		data = new Data(this);
 		config = new Config(this);
+		messages = new Messages(this);
 	}
 
 	@Override
@@ -78,6 +82,11 @@ public class ArimPermsPlugin implements ArimPerms {
 	@Override
 	public Config config() {
 		return config;
+	}
+	
+	@Override
+	public SimpleConfigFramework messages() {
+		return messages;
 	}
 	
 	static boolean matches(String permission, String checkPerm) {
