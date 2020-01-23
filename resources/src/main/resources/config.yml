@@ -1,14 +1,12 @@
 storage:
   mode: 'file'
-  table-prefix: 'arimperms_'
-  file:
-    url: 'jdbc:hsqldb:file:%FILE%;hsqldb.lock_file=false'
-    filename: 'data/database'
   mysql:
+    table-prefix: 'arimperms_'
     host: 'localhost'
     port: 3306
     database: 'permissions'
     username: 'ArimPerms'
     password: 'defaultpassword'
     url: 'jdbc:mysql://%HOST%:%PORT%/%DATABASE%?autoReconnect=true&useUnicode=true&characterEncoding=utf8'
-  restart-on-reload: false
+groups-on-first-join:
+  - 'default'
