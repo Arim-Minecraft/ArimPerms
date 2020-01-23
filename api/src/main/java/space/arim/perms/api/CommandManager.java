@@ -18,7 +18,7 @@
  */
 package space.arim.perms.api;
 
-public interface CommandManager {
+public interface CommandManager extends Configurable {
 
 	void runCommand(CmdSender sender, String[] args);
 	
