@@ -55,4 +55,25 @@ public interface ArimPerms extends PermissionsPlugin, Configurable {
 	
 	SimpleConfig config();
 	
+	@Override
+	default void reload(boolean first) {
+		config().reload();
+		logs().reload(first);
+		data().reload(first);
+		data().readyDb();
+		groups().reload(first);
+		users().reload(first);
+		data().closeDb();
+	}
+	
+	@Override
+	default void close() {
+		data().readyDb();
+		users().close();
+		groups().close();
+		data().closeDb();
+		data().close();
+		logs().close();
+	}
+	
 }
