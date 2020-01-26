@@ -18,9 +18,13 @@
  */
 package space.arim.perms.core;
 
+import space.arim.api.concurrent.AsyncExecution;
+import space.arim.api.uuid.PlayerNotFoundException;
+
 import space.arim.perms.api.ArimPerms;
 import space.arim.perms.api.CmdSender;
 import space.arim.perms.api.CommandManager;
+import space.arim.perms.api.Group;
 
 public class Commands implements CommandManager {
 
@@ -32,7 +36,71 @@ public class Commands implements CommandManager {
 	
 	@Override
 	public void runCommand(CmdSender sender, String[] args) {
-		
+		if (sender.hasPermission("arimperms.cmd.use")) {
+			if (args.length > 0) {
+				if (args[0].equalsIgnoreCase("user")) {
+					if (args.length > 1) {
+						if (core.isOnlineMode()) {
+							core.getRegistry().getRegistration(AsyncExecution.class).execute(() -> userCommand(sender, args));
+						} else {
+							userCommand(sender, args);
+						}
+					} else {
+						sendMessage(sender, core.messages().getString("cmds.user.find"));
+					}
+				} else if (args[0].equalsIgnoreCase("group")) {
+					if (args.length > 1) {
+						groupCommand(sender, args);
+					} else {
+						sendMessage(sender, core.messages().getString("cmds.group.find"));
+					}
+				} else {
+					sendMessage(sender, core.messages().getString("cmds.base-usage"));
+				}
+			} else {
+				sendMessage(sender, core.messages().getString("cmds.base-usage"));
+			}
+		} else {
+			sendMessage(sender, core.messages().getString("cmds.no-permission"));
+		}
+	}
+	
+	private String getIdForName(String name) {
+		try {
+			return core.resolver().resolveName(name, core.isOnlineMode()).toString().replace("-", "");
+		} catch (PlayerNotFoundException ex) {
+			return null;
+		}
+	}
+	
+	private void userCommand(CmdSender sender, String[] args) {
+		String userId = getIdForName(args[1]);
+		if (userId != null) {
+			if (args.length > 2) {
+				
+			} else {
+				sendMessage(sender, core.messages().getString("cmds.user.manipulate.usage").replace("%TARGET%", args[1]));
+			}
+		} else {
+			sendMessage(sender, core.messages().getString("cmds.user.not-found").replace("%TARGET%", args[1]));
+		}
+	}
+	
+	private void groupCommand(CmdSender sender, String[] args) {
+		Group group = core.groups().getPossibleGroup(args[1]);
+		if (group != null) {
+			if (args.length > 2) {
+				
+			} else {
+				sendMessage(sender, core.messages().getString("cmds.group.manipulate.usage").replace("%GROUP%", args[1]));
+			}
+		} else {
+			sendMessage(sender, core.messages().getString("cmds.group.not-found").replace("%GROUP%", args[1]));
+		}
+	}
+	
+	private void sendMessage(CmdSender sender, String message) {
+		sender.sendMessage(core.messages().getBoolean("prefix.enable") ? core.messages().getString("prefix.value") + message : message);
 	}
 
 }
