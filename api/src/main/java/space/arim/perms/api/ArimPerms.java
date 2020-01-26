@@ -19,45 +19,68 @@
 package space.arim.perms.api;
 
 import java.io.File;
-import java.util.UUID;
-
-import org.eclipse.jdt.annotation.Nullable;
-
-import space.arim.universal.registry.Registry;
-import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.config.SimpleConfigFramework;
+import space.arim.api.uuid.UUIDResolver;
 
-public interface ArimPerms extends PermissionsPlugin, Configurable {
-
-	default Registry getRegistry() {
-		return UniversalRegistry.get();
-	}
+/**
+ * A more specific subclass of {@link ArimPermsApi} intended to use all or much of the ArimPerms default implementation. <br>
+ * <br>
+ * Methods in this class are used for specific implementations and may be subject to change as they are not considered part of the official API.
+ * 
+ * @author A248
+ *
+ */
+public interface ArimPerms extends ArimPermsApi {
 	
-	@Override
-	default boolean userHasPermission(UUID player, String permission, @Nullable String world) {
-		return users().getUser(player.toString().replace("-", "")).hasPermission(permission, world);
-	}
-	
-	@Override
-	default boolean groupHasPermission(String group, String permission, @Nullable String world) {
-		return groups().getGroup(group).hasPermission(permission, world);
-	}
-	
+	/**
+	 * The plugin's configuration folder
+	 * 
+	 * @return the folder file
+	 */
 	File getFolder();
 	
-	GroupManager groups();
-	
-	UserManager users();
-	
+	/**
+	 * Used for internal plugin logging
+	 * 
+	 * @return a logs manager
+	 */
 	LogManager logs();
 	
+	/**
+	 * Used for internal command execution
+	 * 
+	 * @return a commands manager
+	 */
 	CommandManager commands();
 	
+	/**
+	 * Handles the saving and loading of users and groups to and from
+	 * the local file system or the MySQL database, depending on configuration.
+	 * 
+	 * @return the data manager
+	 */
 	DataManager data();
 	
+	/**
+	 * A {@link UUIDResolver} used for commands.
+	 * 
+	 * @return the uuid resolver
+	 */
+	UUIDResolver resolver();
+	
+	/**
+	 * The configuration corresponding to the config.yml
+	 * 
+	 * @return a {@link SimpleConfigFramework}
+	 */
 	SimpleConfigFramework config();
 	
+	/**
+	 * The configuration correspondign to the messages.yml
+	 * 
+	 * @return a {@link SimpleConfigFramework}
+	 */
 	SimpleConfigFramework messages();
 	
 	@Override

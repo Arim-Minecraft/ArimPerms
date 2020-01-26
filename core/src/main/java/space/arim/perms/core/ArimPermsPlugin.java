@@ -19,9 +19,9 @@
 package space.arim.perms.core;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import space.arim.api.config.SimpleConfigFramework;
+import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;
 
@@ -29,7 +29,7 @@ public class ArimPermsPlugin implements ArimPerms {
 
 	static final int MAX_RECURSION_DEPTH = 32;
 	
-	private final File folder;
+	private final PluginEnvOptions options;
 	private final Groups groups;
 	private final Users users;
 	private final Logs logs;
@@ -38,20 +38,25 @@ public class ArimPermsPlugin implements ArimPerms {
 	private final Config config;
 	private final Messages messages;
 	
-	public ArimPermsPlugin(File folder, Logger logger) {
-		this.folder = folder;
+	public ArimPermsPlugin(PluginEnvOptions options) {
+		this.options = options;
 		groups = new Groups(this);
 		users = new Users(this);
-		logs = new Logs(this, logger);
+		logs = new Logs(this, options.logger);
 		commands = new Commands(this);
 		data = new Data(this);
 		config = new Config(this);
 		messages = new Messages(this);
 	}
-
+	
 	@Override
 	public File getFolder() {
-		return folder;
+		return options.folder;
+	}
+	
+	@Override
+	public boolean isOnlineMode() {
+		return options.onlineMode;
 	}
 
 	@Override
@@ -77,6 +82,11 @@ public class ArimPermsPlugin implements ArimPerms {
 	@Override
 	public Data data() {
 		return data;
+	}
+	
+	@Override
+	public UUIDResolver resolver() {
+		return getRegistry().getRegistration(UUIDResolver.class);
 	}
 
 	@Override
