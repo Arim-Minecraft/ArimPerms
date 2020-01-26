@@ -18,6 +18,7 @@
  */
 package space.arim.perms.core;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -50,6 +51,11 @@ public class Groups implements GroupManager {
 	@Override
 	public boolean addGroup(Group group) {
 		return groups.put(group.getId(), group) != null;
+	}
+	
+	@Override
+	public Collection<Group> getGroups() {
+		return groups.values();
 	}
 	
 	@Override

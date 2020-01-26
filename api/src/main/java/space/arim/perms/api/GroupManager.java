@@ -18,6 +18,8 @@
  */
 package space.arim.perms.api;
 
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -52,5 +54,12 @@ public interface GroupManager extends Configurable {
 	 * @return false if a group already existed with {@link Group#getId()}, true otherwise
 	 */
 	boolean addGroup(Group group);
+	
+	/**
+	 * Gets all groups tracked.
+	 * 
+	 * @return a collection of all groups
+	 */
+	Collection<Group> getGroups();
 	
 }
