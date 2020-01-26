@@ -24,8 +24,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 public interface PermissionsPlugin {
 
-	boolean userHasPermission(UUID player, String permission, @Nullable String world);
-	
-	boolean groupHasPermission(String group, String permission, @Nullable String world);
+	boolean hasPermission(UUID player, String permission, @Nullable String world);
 	
 }
