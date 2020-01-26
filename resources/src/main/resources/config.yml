@@ -8,5 +8,16 @@ storage:
     username: 'ArimPerms'
     password: 'defaultpassword'
     url: 'jdbc:mysql://%HOST%:%PORT%/%DATABASE%?autoReconnect=true&useUnicode=true&characterEncoding=utf8'
-groups-on-first-join:
-  - 'default'
+add-groups-on:
+  join:
+    - 'default'
+  first-join:
+    - 'default'
+bad-plugins:
+  fail-gracefully: true
+  stringly-players:
+    enable-compatibility: true
+    log-calls:
+      enable: true
+      log-caller-class: false
+do-not-touch-version: 1
