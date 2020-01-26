@@ -1,0 +1,17 @@
+prefix:
+  value: '&6Arim &9Perms &8» '
+  enable: true
+cmds:
+  no-permission: '&cYou cannot use this.'
+  base-usage: '&cUsage: /arimperms &e<user|group>&c ...'
+  user:
+    find: '&cUsage: /arimperms user &e<user_name>&c ...'
+    manipulate:
+      usage: '&cUsage: /arimperms user %TARGET% &e<add|remove>&c ...'
+    not-found: '&cCould not find &5%TARGET%&c.'
+  group:
+    find: '&cUsage: /arimperms group &e<group_id>&c.'
+    manipulate:
+      usage: '&cUsage: /arimperms group %GROUP% &e<add|remove>&c ...'
+    not-found: '&cCould not find &5%GROUP%&c.'
+do-not-touch-version: 1
