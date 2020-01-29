@@ -113,15 +113,6 @@ public interface Group {
 	boolean addPermission(String permission, @Nullable String world);
 	
 	/**
-	 * Adds all permissions to the group with optional world
-	 * 
-	 * @param world the world
-	 * @param permissions the permissions
-	 * @return true if and only if the group's permissions changed as a result of the call
-	 */
-	boolean addPermissions(@Nullable String world, Collection<String> permissions);
-	
-	/**
 	 * Adds all permissions to the group
 	 * 
 	 * @param world the world
@@ -130,6 +121,15 @@ public interface Group {
 	default boolean addPermissions(Collection<String> permissions) {
 		return addPermissions(null, permissions);
 	}
+	
+	/**
+	 * Adds all permissions to the group with optional world
+	 * 
+	 * @param world the world
+	 * @param permissions the permissions
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	boolean addPermissions(@Nullable String world, Collection<String> permissions);
 	
 	/**
 	 * Gets whether this group has a specific permission
@@ -153,7 +153,7 @@ public interface Group {
 	}
 	
 	/**
-	 * Removes a permission from the group
+	 * Remove a permission from the group
 	 * 
 	 * @param permission the permission
 	 * @return true if and only if the group's permissions changed as a result of the call
@@ -163,13 +163,32 @@ public interface Group {
 	}
 	
 	/**
-	 * Removes a permission from the group with optional world
+	 * Remove a permission from the group with optional world
 	 * 
 	 * @param permission the permission
 	 * @param world the world
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	boolean removePermission(String permission, @Nullable String world);
+	
+	/**
+	 * Removes all permissions from the group
+	 * 
+	 * @param permission the permission
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	default boolean removePermissions(Collection<String> permissions) {
+		return removePermissions(null, permissions);
+	}
+	
+	/**
+	 * Removes all permissions from the group with optional world
+	 * 
+	 * @param world the world
+	 * @param permissions the permissions
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	boolean removePermissions(@Nullable String world, Collection<String> permissions);
 	
 	/**
 	 * Instructs this group to recalculate its effective parents. <br>

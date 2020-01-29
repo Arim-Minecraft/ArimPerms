@@ -80,14 +80,12 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean addPermission(String permission, @Nullable String world) {
-		permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
-		return permissions.get(world).add(permission);
+		return permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).add(permission);
 	}
 	
 	@Override
 	public boolean addPermissions(@Nullable String world, Collection<String> permissions) {
-		this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
-		return this.permissions.get(world).addAll(permissions);
+		return this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).addAll(permissions);
 	}
 	
 	@Override
@@ -97,8 +95,12 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean removePermission(String permission, @Nullable String world) {
-		permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet());
-		return permissions.get(world).remove(permission);
+		return permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).remove(permission);
+	}
+	
+	@Override
+	public boolean removePermissions(@Nullable String world, Collection<String> permissions) {
+		return this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).removeAll(permissions);
 	}
 	
 	@Override
