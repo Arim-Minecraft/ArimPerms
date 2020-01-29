@@ -172,7 +172,7 @@ public interface Group {
 	boolean removePermission(String permission, @Nullable String world);
 	
 	/**
-	 * Removes all permissions from the group
+	 * Removes all specified permissions from the group
 	 * 
 	 * @param permission the permission
 	 * @return true if and only if the group's permissions changed as a result of the call
@@ -182,13 +182,30 @@ public interface Group {
 	}
 	
 	/**
-	 * Removes all permissions from the group with optional world
+	 * Removes all specified permissions from the group with optional world
 	 * 
 	 * @param world the world
 	 * @param permissions the permissions
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	boolean removePermissions(@Nullable String world, Collection<String> permissions);
+	
+	/**
+	 * Removes all permissions from the group
+	 * 
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	default boolean clearPermissions() {
+		return clearPermissions(null);
+	}
+	
+	/**
+	 * Removes all permissions from the group with optional world
+	 * 
+	 * @param world the world
+	 * @return true if and only if the group's permissions changed as a result of the call
+	 */
+	boolean clearPermissions(@Nullable String world);
 	
 	/**
 	 * Instructs this group to recalculate its effective parents. <br>

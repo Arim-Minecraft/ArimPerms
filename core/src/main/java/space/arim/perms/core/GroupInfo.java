@@ -106,6 +106,16 @@ public class GroupInfo implements Group {
 	}
 	
 	@Override
+	public boolean clearPermissions(@Nullable String world) {
+		Set<String> perms = permissions.get(world);
+		if (perms == null || perms.isEmpty()) {
+			return false;
+		}
+		perms.clear();
+		return true;
+	}
+	
+	@Override
 	public boolean addParent(Group parent) {
 		Group[] previous = parents;
 		parents = ArraysUtil.addIfNotPresent(previous, parent);
