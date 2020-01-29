@@ -18,20 +18,15 @@
  */
 package space.arim.perms.core;
 
-import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import space.arim.universal.util.collections.CollectionsUtil;
-import space.arim.universal.util.function.LazySingleton;
 
-import space.arim.api.sql.ExecutableQuery;
-import space.arim.api.util.FilesUtil;
 import space.arim.api.util.StringsUtil;
 
 import space.arim.perms.api.ArimPerms;
@@ -43,156 +38,147 @@ public class Data implements DataManager {
 
 	private final ArimPerms core;
 	
-	private final LazySingleton<File> directory;
-	private MySql mysql;
-	
-	private boolean isMySql = false;
+	private StorageMode mode;
+	private Backend backend;
 	private String table_prefix;
 	
 	public Data(ArimPerms core) {
 		this.core = core;
-		directory = new LazySingleton<File>(() -> {
-			File directory = new File(core.getFolder(), "data");
-			if (!directory.isDirectory() && !directory.mkdirs()) {
-				throw new IllegalStateException("Cannot create data directory!");
-			}
-			return directory;
-		});	
 	}
 	
-	private Set<RawGroup> loadRawGroups() {
-		HashSet<RawGroup> rawGroups = new HashSet<RawGroup>();
-		if (isMySql) {
-			try {
-				ResultSet data = mysql.selectionQuery(Query.PreQuery.SELECT_GROUPS.eval(table_prefix));
-				while (data.next()) {
-					rawGroups.add(new RawGroup(data));
-				}
-				return rawGroups;
-			} catch (SQLException ex) {
-				core.logs().exception("Could not load groups from remote database! Using local storage...", ex);
-			}
-		}
-		FilesUtil.readLines(new File(directory.get(), "groups.txt"), (line) -> {
-			String[] data = line.split("|");
-			rawGroups.add(new RawGroup(data[0], data[1], data[2]));
-		}, (ex) -> core.logs().exception("Could not load groups from groups.txt!", ex));
-		return rawGroups;
+	private enum StorageMode {
+		FLATFILE,
+		FILETREE,
+		MYSQL;
 	}
 	
-	private Set<RawUser> loadRawUsers() {
-		HashSet<RawUser> rawUsers = new HashSet<RawUser>();
-		if (isMySql) {
-			try {
-				ResultSet data = mysql.selectionQuery(Query.PreQuery.SELECT_USERS.eval(table_prefix));
-				while (data.next()) {
-					rawUsers.add(new RawUser(data));
-				}
-				return rawUsers;
-			} catch (SQLException ex) {
-				core.logs().exception("Could not load users from remote database! Using local storage...", ex);
+	private Backend getBackend() {
+		if (backend == null) {
+			switch (mode) {
+			case FLATFILE:
+				backend = new FlatFileBackend(core);
+				break;
+			case FILETREE:
+				backend = new FileTreeBackend(core);
+				break;
+			case MYSQL:
+				backend = new MySqlBackend(core, table_prefix);
+				break;
+			default:
+				throw new IllegalStateException("Invalid backend enum!");
+			}
+			if (!backend.start()) {
+				backend.close();
+				backend = new FlatFileBackend(core);
 			}
 		}
-		FilesUtil.readLines(new File(directory.get(), "users.txt"), (line) -> {
-			String[] data = line.split("|");
-			RawUser rawUser = RawUser.from(data[0], data[1]);
-			if (rawUser != null) {
-				rawUsers.add(rawUser);
+		return backend;
+	}
+	
+	private Backend getAltBackend() {
+		return mode.equals(StorageMode.FLATFILE) ? null : new FlatFileBackend(core);
+	}
+	
+	private Stream<RawGroup> loadRawGroups() {
+		Set<RawGroup> rawGroups = getBackend().loadRawGroups();
+		if (rawGroups == null) {
+			Backend alt = getAltBackend();
+			if (alt != null) {
+				rawGroups = alt.loadRawGroups();
 			}
-		}, (ex) -> core.logs().exception("Could not load users from groups.txt!", ex));
-		return rawUsers;
+		}
+		if (rawGroups != null) {
+			return rawGroups.stream();
+		}
+		core.logs().warning("Could not load any groups.");
+		return Stream.empty();
+	}
+	
+	private Stream<RawUser> loadRawUsers() {
+		Set<RawUser> rawUsers = getBackend().loadRawUsers();
+		if (rawUsers == null) {
+			Backend alt = getAltBackend();
+			if (alt != null) {
+				rawUsers = alt.loadRawUsers();
+			}
+		}
+		if (rawUsers != null) {
+			return rawUsers.stream();
+		}
+		core.logs().warning("Could not load any users.");
+		return Stream.empty();
 	}
 	
 	@Override
-	public Collection<Group> loadGroups() {
-		HashSet<Group> groups = new HashSet<Group>();
-		loadRawGroups().forEach((rawGroup) -> groups.add(convertGroupFromRaw(rawGroup)));
-		return groups;
+	public Stream<Group> loadGroups() {
+		return loadRawGroups().map(this::convertGroupFromRaw);
 	}
 	
 	@Override
-	public Collection<User> loadUsers() {
-		HashSet<User> users = new HashSet<User>();
-		loadRawUsers().forEach((rawUser) -> users.add(convertUserFromRaw(rawUser)));
-		return users;
-	}
-	
-	private void printGroupsToFile(RawGroup[] groups) {
-		FilesUtil.writeTo(new File(directory.get(), "groups.txt"), (writer) -> {
-			writer.append(StringsUtil.concat(CollectionsUtil.convertAllToString(groups), '\n'));
-		}, (ex) -> core.logs().exception("Could not save groups to groups.txt!", ex));
-	}
-	
-	private void printUsersToFile(RawUser[] users) {
-		FilesUtil.writeTo(new File(directory.get(), "users.txt"), (writer) -> {
-			writer.append(StringsUtil.concat(CollectionsUtil.convertAllToString(users), '\n'));
-		}, (ex) -> core.logs().exception("Could not save users to users.txt!", ex));
+	public Stream<User> loadUsers() {
+		return loadRawUsers().map(this::convertUserFromRaw);
 	}
 	
 	@Override
 	public void saveGroups(Collection<Group> groups) {
-		RawGroup[] groupData = CollectionsUtil.convertAll(groups.toArray(new Group[] {}), this::convertGroupToRaw);
-		if (isMySql) {
-			try {
-				mysql.executionQueries(CollectionsUtil.convertAll(groupData, this::executeRawGroup));
-				return;
-			} catch (SQLException ex) {
-				core.logs().exception("Could not save groups to remote database! Using local storage...", ex);
+		boolean success = getBackend().saveRawGroups(groups.stream().map(this::convertGroupToRaw));
+		if (!success) {
+			Backend alt = getAltBackend();
+			if (alt != null) {
+				success = alt.saveRawGroups(groups.stream().map(this::convertGroupToRaw));
 			}
 		}
-		printGroupsToFile(groupData);
+		if (!success) {
+			core.logs().warning("Could not save your groups in any format.");
+		}
 	}
 	
 	@Override
 	public void saveUsers(Collection<User> users) {
-		RawUser[] userData = CollectionsUtil.convertAll(users.toArray(new User[] {}), this::convertUserToRaw);
-		if (isMySql) {
-			try {
-				mysql.executionQueries(CollectionsUtil.convertAll(userData, this::executeRawUser));
-				return;
-			} catch (SQLException ex) {
-				core.logs().exception("Could not save users to remote database! Using local storage...", ex);
+		boolean success = getBackend().saveRawUsers(users.stream().map(this::convertUserToRaw).filter(Objects::nonNull));
+		if (!success) {
+			Backend alt = getAltBackend();
+			if (alt != null) {
+				success = alt.saveRawUsers(users.stream().map(this::convertUserToRaw).filter(Objects::nonNull));
 			}
 		}
-		printUsersToFile(userData);
-	}
-	
-	private ExecutableQuery executeRawGroup(RawGroup group) {
-		return group.query().convertToExecutable(table_prefix);
-	}
-	
-	private ExecutableQuery executeRawUser(RawUser user) {
-		return user == null ? null : user.query().convertToExecutable(table_prefix);
-	}
-	
-	@Override
-	public void readyDb() {
-		if (isMySql) {
-			mysql = new MySql(core);
-			if (!mysql.start()) {
-				isMySql = false;
-				mysql.close();
-				core.logs().info("Falling back to file storage mode...");
-			}
+		if (!success) {
+			core.logs().warning("Could not save your users in any format.");
 		}
 	}
 	
-	@Override
-	public void closeDb() {
-		if (isMySql) {
-			mysql.close();
+	private StorageMode getStorageMode() {
+		String storageMode = core.config().getString("storage.mode").toLowerCase();
+		switch (storageMode) {
+		case "sql":
+		case "mysql":
+			return StorageMode.MYSQL;
+		case "tree":
+		case "filetree":
+			return StorageMode.FILETREE;
+		case "flatfile":
+		case "file":
+			return StorageMode.FLATFILE;
+		default:
+			core.logs().warning("Invalid storage mode specified: " + storageMode + " (Available modes are mysql, file, and filetree). Defaulting to FILE...");
+			return StorageMode.FLATFILE;
 		}
 	}
 	
 	@Override
 	public void reload(boolean first) {
-		isMySql = !core.config().getString("storage.mode").equalsIgnoreCase("file");
-		table_prefix = core.config().getString("storage.mysql.table-prefix");
+		if (first) {
+			mode = getStorageMode();
+			table_prefix = core.config().getString("storage.mysql.table-prefix");
+		}
 	}
 	
 	@Override
-	public void close() {
-		
+	public void closeDb() {
+		if (backend != null) {
+			backend.close();
+			backend = null;
+		}
 	}
 	
 	private RawGroup convertGroupToRaw(Group group) {
@@ -221,11 +207,12 @@ public class Data implements DataManager {
 	}
 	
 	private Group convertGroupFromRaw(RawGroup groupData) {
-		Group[] parents = CollectionsUtil.convertAll(groupData.getParents().split(","), (groupId) -> core.groups().getGroup(groupId));
+		
+		Group[] parents = CollectionsUtil.convertAll(groupData.getParents().split(","), core.groups()::getGroup);
+		
 		
 		HashMap<String, Set<String>> worldPermissions = new HashMap<String, Set<String>>();
-		String[] worldsArray = groupData.getPermissions().split(",");
-		for (String worldInfo : worldsArray) {
+		for (String worldInfo : groupData.getPermissions().split(",")) {
 			String[] worldData = worldInfo.split(":");
 			Set<String> permissions = ConcurrentHashMap.newKeySet();
 			for (String permission : worldData[1].split(";")) {
@@ -249,7 +236,7 @@ public class Data implements DataManager {
 	}
 	
 	private User convertUserFromRaw(RawUser userData) {
-		Group[] groups = CollectionsUtil.convertAll(userData.getGroups().split(","), (groupId) -> core.groups().getGroup(groupId));
+		Group[] groups = CollectionsUtil.convertAll(userData.getGroups().split(","), core.groups()::getGroup);
 		User user = core.users().getUser(userData.getId());
 		if (user instanceof UserInfo) {
 			((UserInfo) user).setGroups(groups);
