@@ -89,7 +89,6 @@ public interface ArimPerms extends ArimPermsApi {
 		messages().reload();
 		logs().reload(first);
 		data().reload(first);
-		data().readyDb();
 		groups().reload(first);
 		users().reload(first);
 		data().closeDb();
@@ -97,7 +96,6 @@ public interface ArimPerms extends ArimPermsApi {
 	
 	@Override
 	default void close() {
-		data().readyDb();
 		users().close();
 		groups().close();
 		data().closeDb();
