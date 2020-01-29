@@ -25,6 +25,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import space.arim.universal.registry.Registry;
 import space.arim.universal.registry.UniversalRegistry;
 
+import space.arim.api.annotation.RequireRegistration;
+import space.arim.api.concurrent.AsyncExecution;
+import space.arim.api.concurrent.SyncExecution;
+import space.arim.api.uuid.UUIDResolver;
+
 /**
  * A more specific subclass of {@link PermissionsPlugin} intended to implement the ArimPerms API.
  * 
@@ -38,6 +43,7 @@ public interface ArimPermsApi extends PermissionsPlugin, Configurable {
 	 * 
 	 * @return the corresponding Registry
 	 */
+	@RequireRegistration({AsyncExecution.class, SyncExecution.class, UUIDResolver.class})
 	default Registry getRegistry() {
 		return UniversalRegistry.get();
 	}
