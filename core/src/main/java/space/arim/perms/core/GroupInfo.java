@@ -95,12 +95,14 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean removePermission(String permission, @Nullable String world) {
-		return permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).remove(permission);
+		Set<String> perms = permissions.get(world);
+		return perms != null && perms.remove(permission);
 	}
 	
 	@Override
 	public boolean removePermissions(@Nullable String world, Collection<String> permissions) {
-		return this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).removeAll(permissions);
+		Set<String> perms = this.permissions.get(world);
+		return perms != null && perms.removeAll(permissions);
 	}
 	
 	@Override
@@ -135,9 +137,7 @@ public class GroupInfo implements Group {
 			groups.add(parent);
 			addGroupsRecursive(groups, parent, 0);
 		}
-		if (!groups.isEmpty()) {
-			effective = Collections.unmodifiableSet(groups);
-		}
+		effective = Collections.unmodifiableSet(groups);
 	}
 	
 	@Override

@@ -90,9 +90,7 @@ public class UserInfo implements User {
 				effective.addAll(parent.getPermissions(world));
 			});
 		}
-		if (!effective.isEmpty()) {
-			this.effective.put(world, Collections.unmodifiableSet(effective));
-		}
+		this.effective.put(world, Collections.unmodifiableSet(effective));
 	}
 	
 	@Override
