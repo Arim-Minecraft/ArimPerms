@@ -40,24 +40,21 @@ public class ArimPermsSpigot extends JavaPlugin {
 	public void onEnable() {
 		Class<?> serverClass = getServer().getClass();
 		if (serverClass.getSimpleName().equals("CraftServer")) { // CraftBukkit
-			String versionPrefix;
-			if (serverClass.getName().equals("org.bukkit.craftbukkit.CraftServer")) {
-				versionPrefix = "org.bukkit.craftbukkit.";
-			} else {
-				versionPrefix = serverClass.getName().substring("org.bukkit.craftbukkit".length(), serverClass.getName().length() - "CraftServer".length());
-				versionPrefix = serverClass.getName().substring("org.bukkit.craftbukkit".length());
-				versionPrefix = versionPrefix.substring(0, versionPrefix.length() - "CraftServer".length());
-			}
 			try {
-				playerField = Class.forName(versionPrefix + "entity.CraftHumanEntity").getDeclaredField("perm");
+				playerField = Class.forName(serverClass.getName().substring(0, serverClass.getName().length() - "CraftServer".length()) + "entity.CraftHumanEntity").getDeclaredField("perm");
 			} catch (NoSuchFieldException | SecurityException | ClassNotFoundException ex) {
-				throw new IllegalStateException("Could not initialise permissible injector!", ex);
+				throw new IllegalStateException("Could not determine injection target field!", ex);
 			}
-		//} else if (serverClass.getSimpleName().equals("GlowServer")) { // Glowstone
-			
+		} else if (serverClass.getSimpleName().equals("GlowServer")) { // Glowstone
+			try {
+				playerField = Class.forName("net.glowstone.entity.GlowHumanEntity").getDeclaredField("permissions");
+			} catch (NoSuchFieldException | SecurityException | ClassNotFoundException ex) {
+				throw new IllegalStateException("Could not determine injection target field!", ex);
+			}
 		} else {
 			throw new IllegalStateException("Your server is not running CraftBukkit or Glowstone. Please contact A248 (a248@arim.space) to update ArimPerms for your server version.");
 		}
+		playerField.setAccessible(true);
 		core = new ArimPermsPlugin(new PluginEnvOptions(getDataFolder(), getLogger(), getServer().getOnlineMode()));
 		core.reload(true);
 		getServer().getServicesManager().register(Permission.class, new VaultHook(this, core), this, ServicePriority.High);

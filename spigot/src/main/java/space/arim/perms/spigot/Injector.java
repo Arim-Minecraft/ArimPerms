@@ -33,7 +33,6 @@ abstract class Injector<T> {
 	Injector(T target, Field field) {
 		this.target = target;
 		this.field = field;
-		field.setAccessible(true);
 	}
 	
 	/**
