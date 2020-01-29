@@ -8,10 +8,31 @@ cmds:
     find: '&cUsage: /arimperms user &e<user_name>&c ...'
     manipulate:
       usage: '&cUsage: /arimperms user %TARGET% &e<add|remove>&c ...'
+      add:
+        done: '&7Added user &5%USER%&7 to groups &e%LIST%&7.'
+        already: '&7User &5%USER%&7 is already in groups &e%LIST%&7.'
+      remove:
+        done: '&7Removed user &5%USER%&7 from groups &e%LIST%&7.'
+        already: '&7User &5%USER%&7 is not in groups &e%LIST%&7.'
     not-found: '&cCould not find &5%TARGET%&c.'
   group:
     find: '&cUsage: /arimperms group &e<group_id>&c.'
     manipulate:
       usage: '&cUsage: /arimperms group %GROUP% &e<add|remove>&c ...'
+      add:
+        done: '&7Added perms &e%LIST%&7 to &5%GROUP%&7.'
+        already: '&7Group &5%GROUP%&7 already has perms &e%LIST%&7.'
+      remove:
+        done: '&7Removed perms &e%LIST%&7 from &5%GROUP%&7.'
+        already: '&7Group &5%GROUP%&7 does not have perms &e%LIST%&7.'
+      add-parent:
+        done: '&7Added parents &e%LIST%&7 to &5%GROUP%&7.'
+        already: '&7Group &5%GROUP%&7 already has parents &e%LIST%&7.'
+      remove-parent:
+        done: '&7Removed parents &e%LIST%&7 from &5%GROUP%&7.'
+        already: '&7Group &5%GROUP%&7 does not have parents &e%LIST%&7.'
+    created:
+      done: '&7Created group &5%GROUP%&7.'
+      with-parents: '&7Created group &5%GROUP%&7 with parents &e%LIST%&7.'
     not-found: '&cCould not find &5%GROUP%&c.'
 do-not-touch-version: 1
