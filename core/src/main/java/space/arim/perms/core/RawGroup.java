@@ -55,7 +55,11 @@ class RawGroup {
 	
 	@Override
 	public String toString() {
-		return id + "|" + parents + "|" + permissions;
+		return id + "|" + toStringWithoutId();
+	}
+	
+	String toStringWithoutId() {
+		return parents + "|" + permissions;
 	}
 	
 }
