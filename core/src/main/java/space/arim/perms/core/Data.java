@@ -194,12 +194,7 @@ public class Data implements DataManager {
 	}
 	
 	private static String getPermissions(Group group) {
-		return StringsUtil.concat(CollectionsUtil.wrapAll(group.getWorlds().toArray(new String[] {}), (world) -> {
-			if (world == null) {
-				world = "<MAIN>";
-			}
-			return world + ":" + StringsUtil.concat(group.getPermissions(world), ';');
-		}), ',');
+		return StringsUtil.concat(CollectionsUtil.wrapAll(group.getWorlds().toArray(new String[] {}), (world) -> (world == null ? "<MAIN>" : world) + ":" + StringsUtil.concat(group.getPermissions(world), ';')), ',');
 	}
 	
 	private static String getGroups(User user) {
@@ -209,9 +204,8 @@ public class Data implements DataManager {
 	private Group convertGroupFromRaw(RawGroup groupData) {
 		
 		Group[] parents = CollectionsUtil.convertAll(groupData.getParents().split(","), core.groups()::getGroup);
-		
-		
 		HashMap<String, Set<String>> worldPermissions = new HashMap<String, Set<String>>();
+		
 		for (String worldInfo : groupData.getPermissions().split(",")) {
 			String[] worldData = worldInfo.split(":");
 			Set<String> permissions = ConcurrentHashMap.newKeySet();
