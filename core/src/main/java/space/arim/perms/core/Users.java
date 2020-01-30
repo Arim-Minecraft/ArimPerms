@@ -18,6 +18,8 @@
  */
 package space.arim.perms.core;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import space.arim.perms.api.ArimPerms;
@@ -29,6 +31,7 @@ public class Users implements UserManager {
 	private final ArimPerms core;
 	
 	private final ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();
+	private Collection<User> usersView;
 	
 	public Users(ArimPerms core) {
 		this.core = core;
@@ -47,6 +50,11 @@ public class Users implements UserManager {
 	@Override
 	public boolean addUser(User user) {
 		return users.put(user.getId(), user) != null;
+	}
+	
+	@Override
+	public Collection<User> getUsers() {
+		return usersView != null ? usersView : (usersView = Collections.unmodifiableCollection(users.values()));
 	}
 	
 	@Override

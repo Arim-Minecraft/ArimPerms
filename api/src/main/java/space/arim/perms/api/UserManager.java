@@ -18,6 +18,8 @@
  */
 package space.arim.perms.api;
 
+import java.util.Collection;
+
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
@@ -52,5 +54,12 @@ public interface UserManager extends Configurable {
 	 * @return false if a user already existed with {@link User#getId()}, true otherwise
 	 */
 	boolean addUser(User user);
+	
+	/**
+	 * Gets all users tracked.
+	 * 
+	 * @return a collection of all users
+	 */
+	Collection<User> getUsers();
 	
 }
