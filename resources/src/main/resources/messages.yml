@@ -4,6 +4,7 @@ prefix:
 cmds:
   no-permission: '&cYou cannot use this.'
   base-usage: '&cUsage: /arimperms &e<user|group>&c ...'
+  for-world: ' in world &e%WORLD%&7'
   user:
     find: '&cUsage: /arimperms user &e<user_name>&c ...'
     manipulate:
@@ -19,10 +20,16 @@ cmds:
       clear:
         done: '&7Cleared all groups for &5%USER%&7.'
         already: '&7User &5%USER%&7 is not in any groups.'
+    info:
+      list:
+        list: '&5%USER%&7 is in the following groups: &e%LIST%&7.'
+        none: '&5%USER%&7 is not in any groups.'
+      listperms: 
+        list: '&5%USER%&7 has the following perms: &e%LIST%&7%WORLD%.'
+        none: '&5%USER%&7 has no permissions%WORLD%.'
     not-found: '&cCould not find &5%TARGET%&c.'
   group:
     find: '&cUsage: /arimperms group &e<group_id>&c.'
-    for-world: ' in world &e%WORLD%&7.'
     manipulate:
       usage: '&cUsage: /arimperms group %GROUP% &e<add|remove>&c ...'
       add:
@@ -47,6 +54,16 @@ cmds:
       clear-parents:
         done: '&7Cleared all parents for &5%GROUP%&7.'
         already: '&7Group &5%GROUP%&7 does not have any parents.'
+    info:
+      list:
+        list: '&5%GROUP%&7 has the following perms: &e%LIST%&7%WORLD%.'
+        none: '&5%GROUP%&7 has no permissions%WORLD%.'
+      listusers:
+        list: '&5%GROUP%&7 has the following users: &e%LIST%&7.'
+        none: '&5%GROUP%&7 has no users.'
+      listparents:
+        list: '&5%GROUP%&7 has the following parents: &e%LIST%&7.'
+        none: '&5%GROUP%&7 has no parents.'
     create:
       done: '&7Created group &5%GROUP%&7.'
       already: '&5%GROUP%&7 already exists.'
