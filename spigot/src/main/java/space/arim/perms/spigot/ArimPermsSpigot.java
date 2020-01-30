@@ -25,6 +25,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import space.arim.universal.registry.UniversalRegistry;
+
+import space.arim.api.concurrent.AsyncExecution;
+import space.arim.api.concurrent.SyncExecution;
+import space.arim.api.server.bukkit.DefaultAsyncExecution;
+import space.arim.api.server.bukkit.DefaultSyncExecution;
+import space.arim.api.server.bukkit.DefaultUUIDResolver;
+import space.arim.api.uuid.UUIDResolver;
+
 import space.arim.perms.api.ArimPerms;
 import space.arim.perms.core.ArimPermsPlugin;
 import space.arim.perms.core.PluginEnvOptions;
@@ -35,6 +44,13 @@ public class ArimPermsSpigot extends JavaPlugin {
 
 	ArimPerms core;
 	private Field playerField;
+	
+	@Override
+	public void onLoad() {
+		UniversalRegistry.get().computeIfAbsent(AsyncExecution.class, () -> new DefaultAsyncExecution(this));
+		UniversalRegistry.get().computeIfAbsent(SyncExecution.class, () -> new DefaultSyncExecution(this));
+		UniversalRegistry.get().computeIfAbsent(UUIDResolver.class, () -> new DefaultUUIDResolver(this));
+	}
 	
 	@Override
 	public void onEnable() {
@@ -55,7 +71,7 @@ public class ArimPermsSpigot extends JavaPlugin {
 			throw new IllegalStateException("Your server is not running CraftBukkit or Glowstone. Please contact A248 (a248@arim.space) to update ArimPerms for your server version.");
 		}
 		playerField.setAccessible(true);
-		core = new ArimPermsPlugin(new PluginEnvOptions(getDataFolder(), getLogger(), getServer().getOnlineMode()));
+		core = new ArimPermsPlugin(new PluginEnvOptions(UniversalRegistry.get(), getDataFolder(), getLogger(), getServer().getOnlineMode()));
 		core.reload(true);
 		getServer().getServicesManager().register(Permission.class, new VaultHook(this, core), this, ServicePriority.High);
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);

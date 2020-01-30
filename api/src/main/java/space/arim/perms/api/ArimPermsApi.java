@@ -23,7 +23,6 @@ import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.registry.Registry;
-import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.annotation.RequireRegistration;
 import space.arim.api.concurrent.AsyncExecution;
@@ -44,9 +43,7 @@ public interface ArimPermsApi extends PermissionsPlugin, Configurable {
 	 * @return the corresponding Registry
 	 */
 	@RequireRegistration({AsyncExecution.class, SyncExecution.class, UUIDResolver.class})
-	default Registry getRegistry() {
-		return UniversalRegistry.get();
-	}
+	Registry getRegistry();
 	
 	@Override
 	default boolean hasPermission(UUID player, String permission, @Nullable String world) {

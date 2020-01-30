@@ -20,6 +20,8 @@ package space.arim.perms.core;
 
 import java.io.File;
 
+import space.arim.universal.registry.Registry;
+
 import space.arim.api.config.SimpleConfigFramework;
 import space.arim.api.uuid.UUIDResolver;
 
@@ -47,6 +49,11 @@ public class ArimPermsPlugin implements ArimPerms {
 		data = new Data(this);
 		config = new Config(this);
 		messages = new Messages(this);
+	}
+	
+	@Override
+	public Registry getRegistry() {
+		return options.registry;
 	}
 	
 	@Override
