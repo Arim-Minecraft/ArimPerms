@@ -19,6 +19,7 @@
 package space.arim.perms.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -32,6 +33,7 @@ public class Groups implements GroupManager {
 	private final ArimPerms core;
 	
 	private final ConcurrentHashMap<String, Group> groups = new ConcurrentHashMap<String, Group>();
+	private Collection<Group> groupsView;
 	
 	public Groups(ArimPerms core) {
 		this.core = core;
@@ -55,7 +57,7 @@ public class Groups implements GroupManager {
 	
 	@Override
 	public Collection<Group> getGroups() {
-		return groups.values();
+		return groupsView != null ? groupsView : (groupsView = Collections.unmodifiableCollection(groups.values()));
 	}
 	
 	@Override
