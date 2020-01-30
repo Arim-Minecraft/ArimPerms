@@ -25,7 +25,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import space.arim.universal.util.collections.CollectionsUtil;
 
 /**
- * A permissions group.
+ * A permissions group. <br>
+ * <br>
+ * <b>Specifications</b>: <br>
+ * * {@link #getId()} must return a unique group ID. <br>
+ * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code>
  * 
  * @author A248
  *
@@ -213,15 +217,5 @@ public interface Group {
 	 * 
 	 */
 	void recalculate();
-	
-	/**
-	 * Whether this group is equal to another. Uses {@link #getId()}
-	 * 
-	 * @param group the other group
-	 * @return true if and only if the IDs are equal according to Object#equals
-	 */
-	default boolean equals(Group group) {
-		return group.getId().equalsIgnoreCase(getId());
-	}
 	
 }

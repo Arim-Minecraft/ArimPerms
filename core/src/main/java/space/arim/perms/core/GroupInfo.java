@@ -160,7 +160,7 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof Group && equals((Group) object);
+		return object instanceof Group && getId().equals(((Group) object).getId());
 	}
 	
 }
