@@ -23,7 +23,11 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * A permissions user.
+ * A permissions user. <br>
+ * <br>
+ * <b>Specifications</b>: <br>
+ * * {@link #getId()} must return a unique user ID. <br>
+ * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code>
  * 
  * @author A248
  *
@@ -112,15 +116,5 @@ public interface User {
 	 * @param world the world
 	 */
 	void recalculate(@Nullable String world);
-	
-	/**
-	 * Whether this group is equal to another. Uses {@link #getId()}
-	 * 
-	 * @param group the other group
-	 * @return true if and only if the IDs are equal according to Object#equals
-	 */
-	default boolean equals(User user) {
-		return user.getId().equals(getId());
-	}
 	
 }

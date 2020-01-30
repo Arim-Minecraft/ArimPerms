@@ -37,7 +37,7 @@ public class UserInfo implements User {
 	private final String id;
 	private Group[] groups;
 	
-	private final ConcurrentHashMap<String, Collection<String>> effective = new ConcurrentHashMap<String, Collection<String>>();
+	private final ConcurrentHashMap<String, Set<String>> effective = new ConcurrentHashMap<String, Set<String>>();
 	
 	UserInfo(String id, Group...groups){
 		this.id = id;
@@ -103,7 +103,7 @@ public class UserInfo implements User {
 	
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof User && equals((User) object);
+		return object instanceof User && getId().equals(((User) object).getId());
 	}
 	
 }
