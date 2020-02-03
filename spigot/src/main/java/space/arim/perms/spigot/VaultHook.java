@@ -31,6 +31,7 @@ import org.bukkit.plugin.Plugin;
 import space.arim.universal.util.collections.CollectionsUtil;
 
 import space.arim.api.util.CallerFinder;
+import space.arim.api.util.CallerFinderProvider;
 
 import space.arim.perms.api.ArimPerms;
 import space.arim.perms.api.Group;
@@ -68,7 +69,7 @@ public class VaultHook extends Permission {
 	}
 	
 	private String getCallerClass() {
-		return core.getRegistry().getRegistration(CallerFinder.class).getCallerClass(3).getName();
+		return core.getRegistry().computeIfAbsent(CallerFinder.class, () -> new CallerFinderProvider()).getCallerClass(3).getName();
 	}
 	
 	@Override
