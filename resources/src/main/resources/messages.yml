@@ -3,12 +3,14 @@ prefix:
   enable: true
 cmds:
   no-permission: '&cYou cannot use this.'
-  base-usage: '&cUsage: /arimperms &e<user|group>&c ...'
-  for-world: ' in world &e%WORLD%&7'
+  base-usage: '&cUsage: /arimperms &e<user|group|save-all>&c ...'
+  category:
+    for-specific: ' in world/subserver &e%CATEGORY%&7'
+    general: ' generally.'
   user:
     find: '&cUsage: /arimperms user &e<user_name>&c ...'
+    usage: '&cUsage: /arimperms user %TARGET% &e<add|remove|clear|recalc-groups|list|list-perms>&c ... [category]'
     manipulate:
-      usage: '&cUsage: /arimperms user %TARGET% &e<add|remove>&c ...'
       add:
         done: '&7Added user &5%USER%&7 to groups &e%LIST%&7.'
         already: '&7User &5%USER%&7 is already in groups &e%LIST%&7.'
@@ -20,31 +22,33 @@ cmds:
       clear:
         done: '&7Cleared all groups for &5%USER%&7.'
         already: '&7User &5%USER%&7 is not in any groups.'
+    update:
+      recalc: '&7Recalculated groups for &5%USER%&7. (This command should not be needed, as recalculation is automatic)'
     info:
       list:
         list: '&5%USER%&7 is in the following groups: &e%LIST%&7.'
         none: '&5%USER%&7 is not in any groups.'
-      listperms: 
-        list: '&5%USER%&7 has the following perms: &e%LIST%&7%WORLD%.'
-        none: '&5%USER%&7 has no permissions%WORLD%.'
+      list-perms: 
+        list: '&5%USER%&7 has the following perms: &e%LIST%&7%CATEGORY%.'
+        none: '&5%USER%&7 has no permissions%CATEGORY%.'
     not-found: '&cCould not find &5%TARGET%&c.'
   group:
     find: '&cUsage: /arimperms group &e<group_id>&c.'
+    usage: '&cUsage: /arimperms group %GROUP% &e<add|remove|clear|add-parent|remove-parent|clear-parents|recalc-perms|recalc-parents>&c ... [category]'
     manipulate:
-      usage: '&cUsage: /arimperms group %GROUP% &e<add|remove>&c ...'
       add:
         invalid-char: '&cYou cannot use colons nor semicolons in permission nodes.'
-        done: '&7Added perms &e%LIST%&7 to &5%GROUP%&7%WORLD%.'
-        already: '&7Group &5%GROUP%&7 already has perms &e%LIST%&7%WORLD%.'
-        usage: '&cUsage: /arimperms group %GROUP% add &e<permissions> [world]&c. &7Separate permissions with commas.'
+        done: '&7Added perms &e%LIST%&7 to &5%GROUP%&7%CATEGORY%.'
+        already: '&7Group &5%GROUP%&7 already has perms &e%LIST%&7%CATEGORY%.'
+        usage: '&cUsage: /arimperms group %GROUP% add &e<permissions> [category]&c. &7Separate permissions with commas.'
       remove:
-        done: '&7Removed perms &e%LIST%&7 from &5%GROUP%&7%WORLD%.'
-        already: '&7Group &5%GROUP%&7 does not have perms &e%LIST%&7%WORLD%.'
-        usage: '&cUsage: /arimperms group %GROUP% remove &e<permissions> [world]&c. &7Separate permissions with commas.'
+        done: '&7Removed perms &e%LIST%&7 from &5%GROUP%&7%CATEGORY%.'
+        already: '&7Group &5%GROUP%&7 does not have perms &e%LIST%&7%CATEGORY%.'
+        usage: '&cUsage: /arimperms group %GROUP% remove &e<permissions> [category]&c. &7Separate permissions with commas.'
       clear:
-        done: '&7Removed all perms from &5%GROUP%&7%WORLD%.'
+        done: '&7Removed all perms from &5%GROUP%&7%CATEGORY%.'
         already: '&7Group &5%GROUP%&7 does not have any permissions.'
-        usage: '&cUsage: /arimperms group %GROUP% clear [world]&c. &7Separate permissions with commas.'
+        usage: '&cUsage: /arimperms group %GROUP% clear [category]&c. &7Separate permissions with commas.'
       add-parent:
         done: '&7Added parents &e%LIST%&7 to &5%GROUP%&7.'
         already: '&7Group &5%GROUP%&7 already has parents &e%LIST%&7.'
@@ -54,14 +58,17 @@ cmds:
       clear-parents:
         done: '&7Cleared all parents for &5%GROUP%&7.'
         already: '&7Group &5%GROUP%&7 does not have any parents.'
+    update:
+      recalc-perms: '&7Recalculated permissions for &5%GROUP%&7 and all users in it. (This command should not be needed, as recalculation is automatic)'
+      recalc-parents: '&7Recalculated parent groups for &5%GROUP%&7. (This command should not be needed, as recalculation is automatic)'
     info:
       list:
-        list: '&5%GROUP%&7 has the following perms: &e%LIST%&7%WORLD%.'
-        none: '&5%GROUP%&7 has no permissions%WORLD%.'
-      listusers:
+        list: '&5%GROUP%&7 has the following perms: &e%LIST%&7%CATEGORY%.'
+        none: '&5%GROUP%&7 has no permissions%CATEGORY%.'
+      list-users:
         list: '&5%GROUP%&7 has the following users: &e%LIST%&7.'
         none: '&5%GROUP%&7 has no users.'
-      listparents:
+      list-parents:
         list: '&5%GROUP%&7 has the following parents: &e%LIST%&7.'
         none: '&5%GROUP%&7 has no parents.'
     create:
@@ -69,4 +76,5 @@ cmds:
       already: '&5%GROUP%&7 already exists.'
       with-parents: '&7Created group &5%GROUP%&7 with parents &e%LIST%&7.'
     not-found: '&cCould not find &5%GROUP%&c.'
+  save-all: '&7Saved all users and groups.'
 do-not-touch-version: 1
