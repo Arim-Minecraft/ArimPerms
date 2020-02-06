@@ -22,8 +22,24 @@ import java.util.UUID;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+/**
+ * A generic permissions plugin.
+ * 
+ * @author A248
+ *
+ */
 public interface PermissionsPlugin {
 
-	boolean hasPermission(UUID player, String permission, @Nullable String world);
+	/**
+	 * Checks whether a player has a specific permission with optional permissions category. <br>
+	 * On Spigot servers, the categories are usually the worlds.
+	 * On BungeeCord proxies, the categories are usually the subservers.
+	 * 
+	 * @param player the player UUID
+	 * @param permission the permission
+	 * @param category the permissions category, if <code>null</code>, the main category
+	 * @return true if the user has the permission, false otherwise
+	 */
+	boolean hasPermission(UUID player, String permission, @Nullable String category);
 	
 }
