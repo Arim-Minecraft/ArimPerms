@@ -23,7 +23,11 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Maintains the central collection of groups
+ * Maintains the central collection of groups. <br>
+ * <br>
+ * <b>Specifications</b>: <br>
+ * Method implementations must be thread safe. <br>
+ * {@link #getGroups()} should return a collection in which changes are automatically reflected.
  * 
  * @author A248
  *
@@ -56,9 +60,9 @@ public interface GroupManager extends Configurable {
 	boolean addGroup(Group group);
 	
 	/**
-	 * Gets all groups tracked.
+	 * Gets all groups tracked. The returned Collection automatically reflects changes such as group additions.
 	 * 
-	 * @return a collection of all groups
+	 * @return an immutable collection view of all groups
 	 */
 	Collection<Group> getGroups();
 	

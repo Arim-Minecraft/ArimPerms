@@ -23,7 +23,11 @@ import java.util.Collection;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Maintains the central collection of users
+ * Maintains the central collection of users. <br>
+ * <br>
+ * <b>Specifications</b>: <br>
+ * Method implementations must be thread safe. <br>
+ * {@link #getUsers()} should return a collection in which changes are automatically reflected.
  * 
  * @author A248
  *
@@ -56,9 +60,9 @@ public interface UserManager extends Configurable {
 	boolean addUser(User user);
 	
 	/**
-	 * Gets all users tracked.
+	 * Gets all users tracked. The returned Collection automatically reflects changes such as user additions.
 	 * 
-	 * @return a collection of all users
+	 * @return an immutable collection view of all users
 	 */
 	Collection<User> getUsers();
 	
