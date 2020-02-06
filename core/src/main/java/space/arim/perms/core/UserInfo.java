@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.util.collections.ArraysUtil;
-import space.arim.universal.util.collections.CollectionsUtil;
 
 import space.arim.perms.api.Group;
 import space.arim.perms.api.User;
@@ -55,8 +54,8 @@ public class UserInfo implements User {
 	}
 	
 	@Override
-	public Collection<String> getEffectivePermissions(@Nullable String world) {
-		return effective.getOrDefault(world, Collections.emptySet());
+	public Collection<String> getEffectivePermissions(@Nullable String category) {
+		return effective.getOrDefault(category, Collections.emptySet());
 	}
 	
 	void setGroups(Group[] groups) {
@@ -78,19 +77,19 @@ public class UserInfo implements User {
 	}
 	
 	@Override
-	public boolean hasPermission(String permission, @Nullable String world) {
-		return CollectionsUtil.checkForAnyMatches(getEffectivePermissions(world), (checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
+	public boolean hasPermission(String permission, @Nullable String category) {
+		return getEffectivePermissions(category).stream().anyMatch((checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
 	}
 	
 	@Override
-	public void recalculate(@Nullable String world) {
+	public void recalculate(@Nullable String category) {
 		Set<String> effective = new HashSet<String>();
 		for (Group group : getGroups()) {
 			group.getEffectiveParents().forEach((parent) -> {
-				effective.addAll(parent.getPermissions(world));
+				effective.addAll(parent.getPermissions(category));
 			});
 		}
-		this.effective.put(world, Collections.unmodifiableSet(effective));
+		this.effective.put(category, Collections.unmodifiableSet(effective));
 	}
 	
 	@Override
