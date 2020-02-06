@@ -42,8 +42,8 @@ public class ArimPermsPlugin implements ArimPerms {
 	
 	public ArimPermsPlugin(PluginEnvOptions options) {
 		this.options = options;
-		groups = new Groups(this);
-		users = new Users(this);
+		groups = new Groups();
+		users = new Users();
 		logs = new Logs(this, options.logger);
 		commands = new Commands(this);
 		data = new Data(this);
@@ -95,7 +95,7 @@ public class ArimPermsPlugin implements ArimPerms {
 	public UUIDResolver resolver() {
 		return getRegistry().getRegistration(UUIDResolver.class);
 	}
-
+	
 	@Override
 	public Config config() {
 		return config;
@@ -107,7 +107,7 @@ public class ArimPermsPlugin implements ArimPerms {
 	}
 	
 	static boolean matches(String permission, String checkPerm) {
-		return checkPerm.equalsIgnoreCase(permission) || checkPerm.contains("*") && (checkPerm.equals("*") || checkPerm.endsWith(".*") && permission.startsWith(checkPerm.substring(0, checkPerm.lastIndexOf(".*"))));
+		return checkPerm.equalsIgnoreCase(permission) || checkPerm.equals("*") || checkPerm.endsWith(".*") && permission.startsWith(checkPerm.substring(0, checkPerm.lastIndexOf(".*")));
 	}
 	
 }

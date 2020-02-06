@@ -24,20 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import space.arim.perms.api.ArimPerms;
 import space.arim.perms.api.Group;
 import space.arim.perms.api.GroupManager;
 
 public class Groups implements GroupManager {
 
-	private final ArimPerms core;
-	
 	private final ConcurrentHashMap<String, Group> groups = new ConcurrentHashMap<String, Group>();
 	private Collection<Group> groupsView;
-	
-	public Groups(ArimPerms core) {
-		this.core = core;
-	}
 	
 	@Override
 	public Group getGroup(String id) {
@@ -57,19 +50,7 @@ public class Groups implements GroupManager {
 	
 	@Override
 	public Collection<Group> getGroups() {
-		return groupsView != null ? groupsView : (groupsView = Collections.unmodifiableCollection(groups.values()));
-	}
-	
-	@Override
-	public void reload(boolean first) {
-		if (first) {
-			core.data().loadGroups().forEach(this::addGroup);
-		}
-	}
-	
-	@Override
-	public void close() {
-		core.data().saveGroups(groups.values());
+		return (groupsView != null) ? groupsView : (groupsView = Collections.unmodifiableCollection(groups.values()));
 	}
 	
 }
