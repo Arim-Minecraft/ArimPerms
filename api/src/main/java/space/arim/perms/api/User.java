@@ -27,7 +27,10 @@ import org.eclipse.jdt.annotation.Nullable;
  * <br>
  * <b>Specifications</b>: <br>
  * * {@link #getId()} must return a unique user ID. <br>
- * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code>
+ * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code> <br>
+ * * <code>{@link #hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> <br>
+ * * {@link #hasPermission(String, String)} should check whether the user has the permission ONLY for the category provided.
+ * It should NOT determine whether the user has permission for the category or the general category.
  * 
  * @author A248
  *
@@ -74,12 +77,12 @@ public interface User {
 	}
 	
 	/**
-	 * Returns this user's current calculated permissions with optional world
+	 * Returns this user's current calculated permissions with optional category
 	 * 
-	 * @param world the world
+	 * @param category the category
 	 * @return a collection of all applicable permissions
 	 */
-	Collection<String> getEffectivePermissions(@Nullable String world);
+	Collection<String> getEffectivePermissions(@Nullable String category);
 	
 	/**
 	 * Gets whether this user has a specific permission
@@ -92,18 +95,18 @@ public interface User {
 	}
 	
 	/**
-	 * Gets whether this user has a specific permission with optional world
+	 * Gets whether this user has a specific permission with optional category
 	 * 
 	 * @param permission the permission
-	 * @param world the world
+	 * @param category the category
 	 * @return true if and only if the user has the permission
 	 */
-	default boolean hasPermission(String permission, @Nullable String world) {
-		return getEffectivePermissions(world).contains(permission);
+	default boolean hasPermission(String permission, @Nullable String category) {
+		return getEffectivePermissions(category).contains(permission);
 	}
 	
 	/**
-	 * Instructs this user to recalculate its main permissions
+	 * Instructs this user to recalculate its general permissions
 	 * 
 	 */
 	default void recalculate() {
@@ -111,10 +114,10 @@ public interface User {
 	}
 	
 	/**
-	 * Instructs this user to recalculate its permissions with optional world
+	 * Instructs this user to recalculate its permissions with optional category
 	 * 
-	 * @param world the world
+	 * @param category the category
 	 */
-	void recalculate(@Nullable String world);
+	void recalculate(@Nullable String category);
 	
 }
