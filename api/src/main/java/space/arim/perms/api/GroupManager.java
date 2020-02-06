@@ -55,7 +55,7 @@ public interface GroupManager extends Configurable {
 	 * Adds a Group, overriding potential existing entires.
 	 * 
 	 * @param group the group to add
-	 * @return false if a group already existed with {@link Group#getId()}, true otherwise
+	 * @return true if no group existed with {@link Group#getId()}, false otherwise
 	 */
 	boolean addGroup(Group group);
 	

@@ -55,7 +55,7 @@ public interface UserManager extends Configurable {
 	 * Adds a User, overriding potential existing entires.
 	 * 
 	 * @param user the user to add
-	 * @return false if a user already existed with {@link User#getId()}, true otherwise
+	 * @return true if no user existed with {@link User#getId()}, false otherwise
 	 */
 	boolean addUser(User user);
 	
