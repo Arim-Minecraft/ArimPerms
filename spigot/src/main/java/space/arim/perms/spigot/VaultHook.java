@@ -52,7 +52,7 @@ public class VaultHook extends Permission {
 	}
 	
 	private User getByUUID(UUID uuid) {
-		return core.users().getUser(uuid.toString().replace("-", ""));
+		return core.getUserByUUID(uuid);
 	}
 	
 	private User getByPlayer(OfflinePlayer player) {
