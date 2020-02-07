@@ -18,19 +18,10 @@
  */
 package space.arim.perms.api;
 
-import java.util.Collection;
-import java.util.stream.Stream;
-
 public interface DataManager extends Configurable {
-
-	Stream<Group> loadGroups();
 	
-	Stream<User> loadUsers();
+	void loadAll();
 	
-	void saveGroups(Collection<Group> groups);
-	
-	void saveUsers(Collection<User> users);
-	
-	void closeDb();
+	void saveAll();
 	
 }

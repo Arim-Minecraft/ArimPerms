@@ -18,6 +18,7 @@
  */
 package space.arim.perms.core;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
@@ -109,18 +110,7 @@ public class Data implements DataManager {
 		return Stream.empty();
 	}
 	
-	@Override
-	public Stream<Group> loadGroups() {
-		return loadRawGroups().map(this::convertGroupFromRaw);
-	}
-	
-	@Override
-	public Stream<User> loadUsers() {
-		return loadRawUsers().map(this::convertUserFromRaw);
-	}
-	
-	@Override
-	public void saveGroups(Collection<Group> groups) {
+	private void saveGroups(Collection<Group> groups) {
 		boolean success = getBackend().saveRawGroups(groups.stream().map(this::convertGroupToRaw));
 		if (!success) {
 			Backend alt = getAltBackend();
@@ -133,8 +123,7 @@ public class Data implements DataManager {
 		}
 	}
 	
-	@Override
-	public void saveUsers(Collection<User> users) {
+	private void saveUsers(Collection<User> users) {
 		boolean success = getBackend().saveRawUsers(users.stream().map(this::convertUserToRaw).filter(Objects::nonNull));
 		if (!success) {
 			Backend alt = getAltBackend();
@@ -173,12 +162,25 @@ public class Data implements DataManager {
 		}
 	}
 	
-	@Override
-	public void closeDb() {
+	private void closeBackend() {
 		if (backend != null) {
 			backend.close();
 			backend = null;
 		}
+	}
+	
+	@Override
+	public void loadAll() {
+		loadRawGroups().forEach(this::addGroupFromRaw);
+		loadRawUsers().forEach(this::addUserFromRaw);
+		closeBackend();
+	}
+	
+	@Override
+	public void saveAll() {
+		saveUsers(core.users().getUsers());
+		saveGroups(core.groups().getGroups());
+		closeBackend();
 	}
 	
 	private RawGroup convertGroupToRaw(Group group) {
@@ -194,42 +196,39 @@ public class Data implements DataManager {
 	}
 	
 	private static String getPermissions(Group group) {
-		return StringsUtil.concat(CollectionsUtil.wrapAll(group.getWorlds().toArray(new String[] {}), (world) -> (world == null ? "<MAIN>" : world) + ":" + StringsUtil.concat(group.getPermissions(world), ';')), ',');
+		return StringsUtil.concat(CollectionsUtil.wrapAll(group.getCategories().toArray(new String[] {}), (category) -> (category == null ? "<MAIN>" : category) + ":" + StringsUtil.concat(group.getPermissions(category), ';')), ',');
 	}
 	
 	private static String getGroups(User user) {
 		return StringsUtil.concat(CollectionsUtil.convertAll(user.getGroups(), (group) -> group.getId()), ','); 
 	}
 	
-	private Group convertGroupFromRaw(RawGroup groupData) {
+	private void addGroupFromRaw(RawGroup groupData) {
 		
 		Group[] parents = CollectionsUtil.convertAll(groupData.getParents().split(","), core.groups()::getGroup);
-		HashMap<String, Set<String>> worldPermissions = new HashMap<String, Set<String>>();
+		HashMap<String, Set<String>> categoryPermissions = new HashMap<String, Set<String>>();
 		
-		for (String worldInfo : groupData.getPermissions().split(",")) {
-			String[] worldData = worldInfo.split(":");
+		for (String categoryInfo : groupData.getPermissions().split(",")) {
+			String[] categoryData = categoryInfo.split(":");
 			Set<String> permissions = ConcurrentHashMap.newKeySet();
-			for (String permission : worldData[1].split(";")) {
-				permissions.add(permission);
-			}
-			worldPermissions.put(worldData[0].equals("<MAIN>") ? null : worldData[0], permissions);
+			permissions.addAll(Arrays.asList(categoryData[1].split(";")));
+			categoryPermissions.put(categoryData[0].equals("<MAIN>") ? null : categoryData[0], permissions);
 		}
 		
 		Group group = core.groups().getGroup(groupData.getId());
 		if (group instanceof GroupInfo) {
 			GroupInfo groupInfo = (GroupInfo) group;
 			groupInfo.setParents(parents);
-			worldPermissions.forEach(groupInfo::setPermissions);
+			categoryPermissions.forEach(groupInfo::setPermissions);
 		} else {
 			for (Group parent : parents) {
 				group.addParent(parent);
 			}
-			worldPermissions.forEach(group::addPermissions);
+			categoryPermissions.forEach(group::addPermissions);
 		}
-		return group;
 	}
 	
-	private User convertUserFromRaw(RawUser userData) {
+	private void addUserFromRaw(RawUser userData) {
 		Group[] groups = CollectionsUtil.convertAll(userData.getGroups().split(","), core.groups()::getGroup);
 		User user = core.users().getUser(userData.getId());
 		if (user instanceof UserInfo) {
@@ -239,7 +238,6 @@ public class Data implements DataManager {
 				user.addGroup(group);
 			}
 		}
-		return user;
 	}
 	
 }
