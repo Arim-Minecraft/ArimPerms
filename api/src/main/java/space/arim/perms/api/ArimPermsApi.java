@@ -45,15 +45,33 @@ public interface ArimPermsApi extends PermissionsPlugin, Configurable {
 	@RequireRegistration({AsyncExecution.class, SyncExecution.class, UUIDResolver.class})
 	Registry getRegistry();
 	
-	@Override
-	default boolean hasPermission(UUID player, String permission, @Nullable String world) {
-		return users().getUser(player.toString().replace("-", "")).hasPermission(permission, world);
+	/**
+	 * Gets the {@link User} for a player's UUID.
+	 * 
+	 * @param uuid the player uuid
+	 * @return the corresponding user
+	 */
+	default User getUserByUUID(UUID uuid) {
+		return users().getUser(uuid.toString().replace("-", ""));
 	}
 	
-	boolean isOnlineMode();
+	@Override
+	default boolean hasPermission(UUID player, String permission, @Nullable String section) {
+		return getUserByUUID(player).hasPermission(permission, section);
+	}
 	
+	/**
+	 * Allows for handling groups
+	 * 
+	 * @return the GroupManager
+	 */
 	GroupManager groups();
 	
+	/**
+	 * Allows for handling users
+	 * 
+	 * @return the UserManager
+	 */
 	UserManager users();
 	
 }

@@ -83,6 +83,14 @@ public interface ArimPerms extends ArimPermsApi {
 	 */
 	SimpleConfigFramework messages();
 	
+	/**
+	 * If the server is in online mode. <br>
+	 * Online mode servers authenticate their users with Mojang, offline servers do not.
+	 * 
+	 * @return true if online mode is on, false otherwise
+	 */
+	boolean isOnlineMode();
+	
 	@Override
 	default void reload(boolean first) {
 		config().reload();
@@ -91,14 +99,16 @@ public interface ArimPerms extends ArimPermsApi {
 		data().reload(first);
 		groups().reload(first);
 		users().reload(first);
-		data().closeDb();
+		if (first) {
+			data().loadAll();
+		}
 	}
 	
 	@Override
 	default void close() {
+		data().saveAll();
 		users().close();
 		groups().close();
-		data().closeDb();
 		data().close();
 		logs().close();
 	}
