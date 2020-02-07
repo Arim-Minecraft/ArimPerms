@@ -18,11 +18,16 @@
  */
 package space.arim.perms.bungee;
 
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
+import net.md_5.bungee.api.event.PermissionCheckEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import space.arim.perms.api.User;
 
 class PlayerListener implements Listener {
 
@@ -35,6 +40,16 @@ class PlayerListener implements Listener {
 	@EventHandler(priority = Byte.MIN_VALUE)
 	private void onLogin(LoginEvent evt) {
 		plugin.core.getUserByUUID(evt.getConnection().getUniqueId()).recalculate();
+	}
+	
+	@EventHandler(priority = Byte.MIN_VALUE)
+	private void onPermsCheck(PermissionCheckEvent evt) {
+		CommandSender sender = evt.getSender();
+		if (sender instanceof ProxiedPlayer) {
+			ProxiedPlayer player = ((ProxiedPlayer) sender);
+			User user = plugin.core.getUserByUUID(player.getUniqueId());
+			evt.setHasPermission(user.hasPermission(evt.getPermission()) || user.hasPermission(evt.getPermission(), player.getServer().getInfo().getName()));
+		}
 	}
 	
 	@EventHandler(priority = Byte.MIN_VALUE)
