@@ -38,12 +38,12 @@ class PlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onPreLogin(AsyncPlayerPreLoginEvent evt) {
-		plugin.core.users().getUser(evt.getUniqueId().toString().replace("-", "")).recalculate();
+		plugin.core.getUserByUUID(evt.getUniqueId()).recalculate();
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onLogin(PlayerLoginEvent evt) {
-		plugin.core.users().getUser(evt.getPlayer().getUniqueId().toString().replace("-", "")).recalculate(evt.getPlayer().getWorld().getName());
+		plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getPlayer().getWorld().getName());
 		try {
 			plugin.getInjector(evt.getPlayer()).inject(plugin.getInjection(evt.getPlayer()));
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
