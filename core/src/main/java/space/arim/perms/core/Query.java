@@ -37,13 +37,13 @@ class Query {
 	enum PreQuery {
 		CREATE_TABLE_GROUPS(
 				"CREATE TABLE IF NOT EXISTS `%PREFIX%groups` ("
-						+ "`id` VARCHAR(31) NOT NULL,"
+						+ "`id` VARCHAR(31) NOT NULL PRIMARY KEY,"
 						+ "`parents` TINYTEXT NOT NULL,"
 						+ "`permissions` MEDIUMTEXT NOT NULL)"),
 
 		CREATE_TABLE_USERS(
 				"CREATE TABLE IF NOT EXISTS `%PREFIX%users` ("
-						+ "`id` VARCHAR(31) NOT NULL,"
+						+ "`id` VARCHAR(31) NOT NULL PRIMARY KEY,"
 						+ "`groups` TINYTEXT NOT NULL)"),
 		
 		REPLACE_GROUP(
