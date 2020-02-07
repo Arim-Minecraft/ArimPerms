@@ -87,7 +87,7 @@ public class ArimPermsSpigot extends JavaPlugin {
 	}
 	
 	PermissibleReplacement getInjection(Player player) {
-		return new PermissibleReplacement(this, core.users().getUser(player.getUniqueId().toString().replace("-", "")), player);
+		return new PermissibleReplacement(this, core.getUserByUUID(player.getUniqueId()), player);
 	}
 	
 }
