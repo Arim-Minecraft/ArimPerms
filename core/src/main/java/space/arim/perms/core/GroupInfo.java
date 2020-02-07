@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.util.collections.ArraysUtil;
-import space.arim.universal.util.collections.CollectionsUtil;
 
 import space.arim.perms.api.Group;
 
@@ -56,8 +55,8 @@ public class GroupInfo implements Group {
 	}
 	
 	@Override
-	public Collection<String> getPermissions(@Nullable String world) {
-		return Collections.unmodifiableSet(permissions.getOrDefault(world, Collections.emptySet()));
+	public Collection<String> getPermissions(@Nullable String category) {
+		return Collections.unmodifiableSet(permissions.getOrDefault(category, Collections.emptySet()));
 	}
 	
 	@Override
@@ -66,7 +65,7 @@ public class GroupInfo implements Group {
 	}
 	
 	@Override
-	public Collection<String> getWorlds() {
+	public Collection<String> getCategories() {
 		return Collections.unmodifiableSet(permissions.keySet());
 	}
 	
@@ -74,40 +73,49 @@ public class GroupInfo implements Group {
 		this.parents = parents;
 	}
 	
-	void setPermissions(@Nullable String world, Set<String> permissions) {
-		this.permissions.put(world, permissions);
+	/**
+	 * Sets the permissions of the Group to the permissions set with optional category <br>
+	 * <br>
+	 * <b>Notice</b>: The set is NOT copied. It is directly inserted into this Group's data.
+	 * <i>Therefore, please use {@link ConcurrentHashMap#newKeySet()} or some other set supporting atomic reads and writes</i>
+	 * 
+	 * @param category the category
+	 * @param permissions the permissions set, which should support atomic reads and writes
+	 */
+	void setPermissions(@Nullable String category, Set<String> permissions) {
+		this.permissions.put(category, permissions);
 	}
 	
 	@Override
-	public boolean addPermission(String permission, @Nullable String world) {
-		return permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).add(permission);
+	public boolean addPermission(String permission, @Nullable String category) {
+		return permissions.computeIfAbsent(category, (w) -> ConcurrentHashMap.newKeySet()).add(permission);
 	}
 	
 	@Override
-	public boolean addPermissions(@Nullable String world, Collection<String> permissions) {
-		return this.permissions.computeIfAbsent(world, (w) -> ConcurrentHashMap.newKeySet()).addAll(permissions);
+	public boolean addPermissions(@Nullable String category, Collection<String> permissions) {
+		return this.permissions.computeIfAbsent(category, (w) -> ConcurrentHashMap.newKeySet()).addAll(permissions);
 	}
 	
 	@Override
-	public boolean hasPermission(String permission, @Nullable String world) {
-		return CollectionsUtil.checkForAnyMatches(getPermissions(world), (checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
+	public boolean hasPermission(String permission, @Nullable String category) {
+		return permissions.getOrDefault(category, Collections.emptySet()).stream().anyMatch((checkPerm) -> ArimPermsPlugin.matches(permission, checkPerm));
 	}
 	
 	@Override
-	public boolean removePermission(String permission, @Nullable String world) {
-		Set<String> perms = permissions.get(world);
+	public boolean removePermission(String permission, @Nullable String category) {
+		Set<String> perms = permissions.get(category);
 		return perms != null && perms.remove(permission);
 	}
 	
 	@Override
-	public boolean removePermissions(@Nullable String world, Collection<String> permissions) {
-		Set<String> perms = this.permissions.get(world);
+	public boolean removePermissions(@Nullable String category, Collection<String> permissions) {
+		Set<String> perms = this.permissions.get(category);
 		return perms != null && perms.removeAll(permissions);
 	}
 	
 	@Override
-	public boolean clearPermissions(@Nullable String world) {
-		Set<String> perms = permissions.get(world);
+	public boolean clearPermissions(@Nullable String category) {
+		Set<String> perms = permissions.get(category);
 		if (perms == null || perms.isEmpty()) {
 			return false;
 		}
@@ -133,8 +141,8 @@ public class GroupInfo implements Group {
 		if (recursion > ArimPermsPlugin.MAX_RECURSION_DEPTH) {
 			throw new IllegalStateException("Group recursion checking entered depth " + ArimPermsPlugin.MAX_RECURSION_DEPTH + "!");
 		}
+		existing.add(group);
 		for (Group parent : group.getParents()) {
-			existing.add(parent);
 			addGroupsRecursive(existing, parent, ++recursion);
 		}
 	}
@@ -142,11 +150,7 @@ public class GroupInfo implements Group {
 	@Override
 	public void recalculate() {
 		Set<Group> groups = new HashSet<Group>();
-		groups.add(this);
-		for (Group parent : getParents()) {
-			groups.add(parent);
-			addGroupsRecursive(groups, parent, 0);
-		}
+		addGroupsRecursive(groups, this, 0);
 		effective = Collections.unmodifiableSet(groups);
 	}
 	
