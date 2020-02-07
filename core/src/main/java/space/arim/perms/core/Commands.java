@@ -20,7 +20,9 @@ package space.arim.perms.core;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import space.arim.universal.util.collections.CollectionsUtil;
 
@@ -90,6 +92,8 @@ public class Commands implements CommandManager {
 					} else {
 						sendMessage(sender, core.messages().getString("cmds.group.find"));
 					}
+				} else if (args[0].equalsIgnoreCase("save-all")) {
+					
 				} else {
 					sendMessage(sender, core.messages().getString("cmds.base-usage"));
 				}
@@ -109,8 +113,8 @@ public class Commands implements CommandManager {
 		}
 	}
 	
-	private void userCommand(CmdSender sender, String[] args, boolean queryName) {
-		String userId = getIdForName(args[1], queryName);
+	private void userCommand(CmdSender sender, String[] args, boolean async) {
+		String userId = getIdForName(args[1], async);
 		if (userId != null) {
 			if (args.length > 2) {
 				User user = core.users().getUser(userId);
@@ -118,7 +122,7 @@ public class Commands implements CommandManager {
 					if (args.length > 3) {
 						Group[] groups = validateGroups(sender, args[3]);
 						if (groups != null) {
-							sendMessage(sender, core.messages().getString("cmds.user.manipulate.add." + (CollectionsUtil.checkForAnyMatches(groups, user::addGroup) ? "done" : "already")).replace("%USER%", args[1]).replace("%LIST%", args[3]));
+							sendMessage(sender, core.messages().getString("cmds.user.manipulate.add." + (recalcUserGroupsIf(user, CollectionsUtil.checkForAnyMatches(groups, user::addGroup)) ? "done" : "already")).replace("%USER%", args[1]).replace("%LIST%", args[3]));
 						}
 					} else {
 						sendMessage(sender, core.messages().getString("cmds.user.manipulate.add.usage").replace("%USER%", args[1]));
@@ -127,26 +131,29 @@ public class Commands implements CommandManager {
 					if (args.length > 3) {
 						Group[] groups = validateGroups(sender, args[3]);
 						if (groups != null) {
-							sendMessage(sender, core.messages().getString("cmds.user.manipulate.remove." + (CollectionsUtil.checkForAnyMatches(groups, user::removeGroup) ? "done" : "already")).replace("%USER%", args[1]).replace("%LIST%", args[3]));
+							sendMessage(sender, core.messages().getString("cmds.user.manipulate.remove." + (recalcUserGroupsIf(user, CollectionsUtil.checkForAnyMatches(groups, user::removeGroup)) ? "done" : "already")).replace("%USER%", args[1]).replace("%LIST%", args[3]));
 						}
 					} else {
 						sendMessage(sender, core.messages().getString("cmds.user.manipulate.remove.usage").replace("%USER%", args[1]));
 					}
 				} else if (args[3].equalsIgnoreCase("clear")) {
-					sendMessage(sender, core.messages().getString("cmds.user.manipulate.clear." + (CollectionsUtil.checkForAnyMatches(user.getGroups(), user::removeGroup) ? "done" : "already")).replace("%USER%", args[1]));
+					sendMessage(sender, core.messages().getString("cmds.user.manipulate.clear." + (recalcUserGroupsIf(user, CollectionsUtil.checkForAnyMatches(user.getGroups(), user::removeGroup)) ? "done" : "already")).replace("%USER%", args[1]));
+				} else if (args[3].equalsIgnoreCase("recalc")) {
+					recalcUserPerms(user);
+					sendMessage(sender, core.messages().getString("cmds.user.update.recalc").replace("%USER%", args[1]));
 				} else if (args[3].equalsIgnoreCase("list")) {
 					Group[] groups = user.getGroups();
 					sendMessage(sender, core.messages().getString("cmds.user.info.list." + (groups.length > 0 ? "list" : "none")).replace("%USER%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(groups, (group) -> group.getId()), ',')));
-				} else if (args[3].equalsIgnoreCase("listperms")) {
-					String world = (args.length > 3) ? args[3] : null;
-					String worldMsg = (world == null) ? "" : core.messages().getString("cmds.for-world").replace("%WORLD%", world);
-					Collection<String> perms = user.getEffectivePermissions(world);
-					sendMessage(sender, core.messages().getString("cmds.user.info.listperms." + (!perms.isEmpty() ? "list" : "none")).replace("%USER%", args[1]).replace("%WORLD%", worldMsg).replace("%LIST%", StringsUtil.concat(perms, ',')));
+				} else if (args[3].equalsIgnoreCase("list-perms")) {
+					String category = (args.length > 3) ? args[3] : null;
+					String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
+					Collection<String> perms = user.getEffectivePermissions(category);
+					sendMessage(sender, core.messages().getString("cmds.user.info.list-perms." + (!perms.isEmpty() ? "list" : "none")).replace("%USER%", args[1]).replace("%CATEGORY%", categoryMsg).replace("%LIST%", StringsUtil.concat(perms, ',')));
 				} else {
-					sendMessage(sender, core.messages().getString("cmds.user.manipulate.usage").replace("%TARGET%", args[1]));
+					sendMessage(sender, core.messages().getString("cmds.user.usage").replace("%TARGET%", args[1]));
 				}
 			} else {
-				sendMessage(sender, core.messages().getString("cmds.user.manipulate.usage").replace("%TARGET%", args[1]));
+				sendMessage(sender, core.messages().getString("cmds.user.usage").replace("%TARGET%", args[1]));
 			}
 		} else {
 			sendMessage(sender, core.messages().getString("cmds.user.not-found").replace("%TARGET%", args[1]));
@@ -196,54 +203,60 @@ public class Commands implements CommandManager {
 					if (args[3].contains(";") || args[3].contains(":")) {
 						sendMessage(sender, core.messages().getString("cmds.group.manipulate.add.invalid-char"));
 					}
-					String world = (args.length > 4) ? args[4] : null;
-					String worldMsg = (world == null) ? "" : core.messages().getString("cmds.for-world").replace("%WORLD%", world);
-					sendMessage(sender, core.messages().getString("cmds.group.manipulate.add." + (group.addPermissions(world, Arrays.asList(args[3].split(","))) ? "done" : "already")).replace("%WORLD%", worldMsg).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
+					String category = (args.length > 4) ? args[4] : null;
+					String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
+					sendMessage(sender, core.messages().getString("cmds.group.manipulate.add." + (recalcGroupPermsIf(group, group.addPermissions(category, Arrays.asList(args[3].split(",")))) ? "done" : "already")).replace("%CATEGORY%", categoryMsg).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
 				} else {
 					sendMessage(sender, core.messages().getString("cmds.group.manipulate.add.usage").replace("%GROUP%", args[1]));
 				}
 			} else if (args[2].equalsIgnoreCase("remove")) {
 				if (args.length > 4) {
-					String world = (args.length > 4) ? args[4] : null;
-					String worldMsg = (world == null) ? "" : core.messages().getString("cmds.for-world").replace("%WORLD%", world);
-					sendMessage(sender, core.messages().getString("cmds.group.manipulate.remove." + (group.removePermissions(world, Arrays.asList(args[3].split(","))) ? "done" : "already")).replace("%WORLD%", worldMsg).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
+					String category = (args.length > 4) ? args[4] : null;
+					String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
+					sendMessage(sender, core.messages().getString("cmds.group.manipulate.remove." + (recalcGroupPermsIf(group, group.removePermissions(category, Arrays.asList(args[3].split(",")))) ? "done" : "already")).replace("%CATEGORY%", categoryMsg).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
 				} else {
 					sendMessage(sender, core.messages().getString("cmds.group.manipulate.remove.usage").replace("%GROUP%", args[1]));
 				}
 			} else if (args[2].equalsIgnoreCase("clear")) {
-				String world = (args.length > 3) ? args[4] : null;
-				String worldMsg = (world == null) ? "" : core.messages().getString("cmds.for-world").replace("%WORLD%", world);
-				sendMessage(sender, core.messages().getString("cmds.group.manipulate.clear." + (world == null ? CollectionsUtil.checkForAnyMatches(group.getWorlds(), group::clearPermissions) : group.clearPermissions(world) ? "done" : "already")).replace("%WORLD%", worldMsg).replace("%GROUP%", args[1]));
-			} else if (args[2].equalsIgnoreCase("addparent")) {
+				String category = (args.length > 3) ? args[4] : null;
+				String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
+				sendMessage(sender, core.messages().getString("cmds.group.manipulate.clear." + (recalcGroupPermsIf(group, group.clearPermissions(category)) ? "done" : "already")).replace("%CATEGORY%", categoryMsg).replace("%GROUP%", args[1]));
+			} else if (args[2].equalsIgnoreCase("add-parent")) {
 				Group[] parents = validateGroups(sender, args[3]);
 				if (parents != null) {
-					sendMessage(sender, core.messages().getString("cmds.group.manipulate.add-parent." + (CollectionsUtil.checkForAnyMatches(parents, group::addParent) ? "done" : "already")).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
+					sendMessage(sender, core.messages().getString("cmds.group.manipulate.add-parent." + (recalcGroupParentsIf(group, CollectionsUtil.checkForAnyMatches(parents, group::addParent)) ? "done" : "already")).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
 				}
-			} else if (args[2].equalsIgnoreCase("removeparent")) {
+			} else if (args[2].equalsIgnoreCase("remove-parent")) {
 				Group[] parents = validateGroups(sender, args[3]);
 				if (parents != null) {
-					sendMessage(sender, core.messages().getString("cmds.group.manipulate.remove-parent." + (CollectionsUtil.checkForAnyMatches(parents, group::removeParent) ? "done" : "already")).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
+					sendMessage(sender, core.messages().getString("cmds.group.manipulate.remove-parent." + (recalcGroupParentsIf(group, CollectionsUtil.checkForAnyMatches(parents, group::removeParent)) ? "done" : "already")).replace("%GROUP%", args[1]).replace("%LIST%", args[3]));
 				}
-			} else if (args[2].equalsIgnoreCase("clearparents")) {
-				sendMessage(sender, core.messages().getString("cmds.group.manipulate.clear-parents." + (CollectionsUtil.checkForAnyMatches(group.getEffectiveParents(), group::removeParent) ? "done" : "already")).replace("%GROUP%", args[1]));
+			} else if (args[2].equalsIgnoreCase("clear-parents")) {
+				sendMessage(sender, core.messages().getString("cmds.group.manipulate.clear-parents." + (recalcGroupParentsIf(group, CollectionsUtil.checkForAnyMatches(group.getEffectiveParents(), group::removeParent)) ? "done" : "already")).replace("%GROUP%", args[1]));
+			} else if (args[3].equalsIgnoreCase("recalc-perms")) {
+				recalcUserPermsForGroup(group);
+				sendMessage(sender, core.messages().getString("cmds.group.update.recalc-perms").replace("%GROUP%", args[1]));
+			} else if (args[3].equalsIgnoreCase("recalc-parents")) {
+				recalcGroupParents(group);
+				sendMessage(sender, core.messages().getString("cmds.group.update.recalc-parents").replace("%GROUP%", args[1]));
 			} else if (args[3].equalsIgnoreCase("create")) {
 				sendMessage(sender, core.messages().getString("cmds.group.create.already").replace("%GROUP%", args[1]));
 			} else if (args[3].equalsIgnoreCase("list")) {
-				String world = (args.length > 3) ? args[3] : null;
-				String worldMsg = (world == null) ? "" : core.messages().getString("cmds.for-world").replace("%WORLD%", world);
-				Collection<String> perms = group.getPermissions(world);
-				sendMessage(sender, core.messages().getString("cmds.group.info.list." + (!perms.isEmpty() ? "list" : "none")).replace("%GROUP%", args[1]).replace("%WORLD%", worldMsg).replace("%LIST%", StringsUtil.concat(perms, ',')));
-			} else if (args[3].equalsIgnoreCase("listusers")) {
-				Collection<String> users = core.users().getUsers().stream().filter((user) -> CollectionsUtil.checkForAnyMatches(user.getGroups(), group::equals)).map((user) -> user.getId()).collect(Collectors.toSet());
-				sendMessage(sender, core.messages().getString("cmds.user.info.listusers." + (!users.isEmpty() ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(users, ',')));
-			} else if (args[3].equalsIgnoreCase("listparents")) {
+				String category = (args.length > 3) ? args[3] : null;
+				String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
+				Collection<String> perms = group.getPermissions(category);
+				sendMessage(sender, core.messages().getString("cmds.group.info.list." + (!perms.isEmpty() ? "list" : "none")).replace("%GROUP%", args[1]).replace("%CATEGORY%", categoryMsg).replace("%LIST%", StringsUtil.concat(perms, ',')));
+			} else if (args[3].equalsIgnoreCase("list-users")) {
+				Collection<String> users = getUsersInGroup(group).map((user) -> user.getId()).collect(Collectors.toSet());
+				sendMessage(sender, core.messages().getString("cmds.user.info.list-users." + (!users.isEmpty() ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(users, ',')));
+			} else if (args[3].equalsIgnoreCase("list-parents")) {
 				Group[] parents = group.getParents();
-				sendMessage(sender, core.messages().getString("cmds.user.info.listparents." + (parents.length > 0 ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(parents, (parent) -> parent.getId()), ',')));
+				sendMessage(sender, core.messages().getString("cmds.user.info.list-parents." + (parents.length > 0 ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(parents, (parent) -> parent.getId()), ',')));
 			} else {
-				sendMessage(sender, core.messages().getString("cmds.group.manipulate.usage").replace("%GROUP%", args[1]));
+				sendMessage(sender, core.messages().getString("cmds.group.usage").replace("%GROUP%", args[1]));
 			}
 		} else {
-			sendMessage(sender, core.messages().getString("cmds.group.manipulate.usage").replace("%GROUP%", args[1]));
+			sendMessage(sender, core.messages().getString("cmds.group.usage").replace("%GROUP%", args[1]));
 		}
 	}
 	
@@ -253,6 +266,48 @@ public class Commands implements CommandManager {
 	
 	private void sendMessage(CmdSender sender, String message) {
 		sender.sendMessage(core.messages().getBoolean("prefix.enable") ? core.messages().getString("prefix.value") + message : message);
+	}
+	
+	private Stream<User> getUsersInGroup(Group group) {
+		return core.users().getUsers().stream().filter((user) -> CollectionsUtil.checkForAnyMatches(user.getGroups(), group::equals));
+	}
+	
+	private void recalcUserPerms(User user) {
+		HashSet<String> categorys = new HashSet<String>();
+		for (Group group : user.getGroups()) {
+			group.getCategories().forEach(categorys::add);
+		}
+		categorys.forEach(user::recalculate);
+	}
+	
+	private void recalcUserPermsForGroup(Group group) {
+		getUsersInGroup(group).forEach((user) -> group.getCategories().forEach(user::recalculate));
+	}
+	
+	private void recalcGroupParents(Group group) {
+		group.recalculate();
+		recalcUserPermsForGroup(group);
+	}
+	
+	private boolean recalcUserGroupsIf(User user, boolean changed) {
+		if (changed) {
+			recalcUserPerms(user);
+		}
+		return changed;
+	}
+	
+	private boolean recalcGroupPermsIf(Group group, boolean changed) {
+		if (changed) {
+			recalcUserPermsForGroup(group);
+		}
+		return changed;
+	}
+	
+	private boolean recalcGroupParentsIf(Group group, boolean changed) {
+		if (changed) {
+			recalcGroupParents(group);
+		}
+		return changed;
 	}
 
 }
