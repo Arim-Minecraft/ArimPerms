@@ -21,7 +21,7 @@ package space.arim.perms.core;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import space.arim.universal.util.lang.AutoClosable;
+import space.arim.universal.util.AutoClosable;
 
 public interface Backend extends AutoClosable {
 

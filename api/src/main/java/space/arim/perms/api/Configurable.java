@@ -18,7 +18,7 @@
  */
 package space.arim.perms.api;
 
-import space.arim.universal.util.lang.AutoClosable;
+import space.arim.universal.util.AutoClosable;
 
 /**
  * Represents some component of ArimPerms which may use configuration values
