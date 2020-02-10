@@ -54,7 +54,7 @@ class PlayerListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onWorldChange(PlayerTeleportEvent evt) {
 		if (!evt.getFrom().getWorld().getName().equals(evt.getTo().getWorld().getName())) {
-			plugin.core.users().getUser(evt.getPlayer().getUniqueId().toString().replace("-", "")).recalculate(evt.getTo().getWorld().getName());
+			plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getTo().getWorld().getName());
 		}
 	}
 	

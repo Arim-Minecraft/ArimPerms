@@ -121,7 +121,7 @@ public class Logs implements LogManager {
 				verboseLog.setLevel(Level.ALL);
 				infoLog.setLevel(Level.CONFIG);
 				errorLog.setLevel(Level.WARNING);
-				logger = Logger.getLogger("ArimPerms-Core");
+				logger = Logger.getLogger(core.getName());
 				logger.setParent(environmentLogger);
 				logger.setUseParentHandlers(false);
 				logger.addHandler(verboseLog);
