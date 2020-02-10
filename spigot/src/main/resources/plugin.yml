@@ -5,3 +5,9 @@ author: ${plugin.author}
 website: ${plugin.url}
 description: ${plugin.description}
 depend: [ArimAPI]
+
+commands:
+  arimperms:
+    description: Everything related to ArimPerms
+    aliases: ap
+    usage: /arimperms <arguments>
