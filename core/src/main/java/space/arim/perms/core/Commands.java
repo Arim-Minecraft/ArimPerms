@@ -73,7 +73,7 @@ public class Commands implements CommandManager {
 	 */
 	
 	@Override
-	public void runCommand(CmdSender sender, String[] args) {
+	public boolean execute(CmdSender sender, String[] args) {
 		if (sender.hasPermission("arimperms.use")) {
 			if (args.length > 0) {
 				if (args[0].equalsIgnoreCase("user")) {
@@ -103,6 +103,7 @@ public class Commands implements CommandManager {
 		} else {
 			noPermission(sender);
 		}
+		return true;
 	}
 	
 	private String getIdForName(String name, boolean query) {
