@@ -22,13 +22,15 @@ import java.util.UUID;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import space.arim.universal.registry.Registrable;
+
 /**
  * A generic permissions plugin.
  * 
  * @author A248
  *
  */
-public interface PermissionsPlugin {
+public interface PermissionsPlugin extends Registrable {
 
 	/**
 	 * Checks whether a player has a specific permission with optional permissions category. <br>

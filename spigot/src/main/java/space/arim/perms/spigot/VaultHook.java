@@ -72,6 +72,10 @@ public class VaultHook extends Permission {
 		return core.getRegistry().computeIfAbsent(CallerFinder.class, () -> new CallerFinderProvider()).getCallerClass(3).getName();
 	}
 	
+	private boolean userHas(User user, String permission, String world) {
+		return user.hasPermission(permission) || user.hasPermission(permission, world);
+	}
+	
 	@Override
 	public String getName() {
 		return plugin.getDescription().getName();
@@ -106,7 +110,7 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public boolean has(Player player, String permission) {
-		return getByPlayer(player).hasPermission(permission);
+		return userHas(getByPlayer(player), permission, player.getWorld().getName());
 	}
 	
 	@Override
@@ -118,7 +122,7 @@ public class VaultHook extends Permission {
 			core.logs().verbose(core.config().getBoolean("bad-plugins.stringly-players.log-calls.log-caller-class") ? "An outdated plugin (" + getCallerClass() + ") called a deprecated method. Consider updating it." : "An outdated plugin called a deprecated method. Consider updating it.");
 		}
 		UUID uuid = getPossibleId(player);
-		return uuid != null && getByUUID(uuid).hasPermission(permission, world);
+		return uuid != null && userHas(getByUUID(uuid), permission, world);
 	}
 	
 	@Override
@@ -129,7 +133,7 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public boolean playerHas(String world, OfflinePlayer player, String permission) {
-		return getByPlayer(player).hasPermission(permission, world);
+		return userHas(getByPlayer(player), permission, world);
 	}
 	
 	@Override
@@ -224,7 +228,8 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public boolean groupHas(String world, String group, String permission) {
-		return core.groups().getGroup(group).hasPermission(permission, world);
+		Group groupId = core.groups().getGroup(group);
+		return groupId.hasPermission(permission) || groupId.hasPermission(permission, world);
 	}
 	
 	@Override
@@ -300,7 +305,7 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public boolean playerAddGroup(String world, OfflinePlayer player, String group) {
-		return getByPlayer(player).addGroup(core.groups().getGroup(group));
+		return getByPlayer(player).addGroup(core.groups().getGroup(group)) || true;
 	}
 	
 	@Override
@@ -328,7 +333,7 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public boolean playerRemoveGroup(String world, OfflinePlayer player, String group) {
-		return getByPlayer(player).removeGroup(core.groups().getGroup(group));
+		return getByPlayer(player).removeGroup(core.groups().getGroup(group)) || true;
 	}
 	
 	@Override

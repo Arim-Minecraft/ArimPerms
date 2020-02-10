@@ -21,17 +21,23 @@ package space.arim.perms.core;
 import java.io.File;
 
 import space.arim.universal.registry.Registry;
+import space.arim.universal.registry.RegistryPriority;
 
 import space.arim.api.config.SimpleConfigFramework;
+import space.arim.api.server.PluginInformation;
 import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;
+import space.arim.perms.api.PermissionsPlugin;
 
 public class ArimPermsPlugin implements ArimPerms {
 
 	static final int MAX_RECURSION_DEPTH = 32;
 	
-	private final PluginEnvOptions options;
+	private final Registry registry;
+	private final PluginInformation information;
+	private final File folder;
+	private final boolean onlineMode;
 	private final Groups groups;
 	private final Users users;
 	private final Logs logs;
@@ -40,8 +46,11 @@ public class ArimPermsPlugin implements ArimPerms {
 	private final Config config;
 	private final Messages messages;
 	
-	public ArimPermsPlugin(PluginEnvOptions options) {
-		this.options = options;
+	public ArimPermsPlugin(Registry registry, PluginInformation information, PluginEnvOptions options) {
+		this.registry = registry;
+		this.information = information;
+		folder = options.folder;
+		onlineMode = options.onlineMode;
 		groups = new Groups();
 		users = new Users();
 		logs = new Logs(this, options.logger);
@@ -49,21 +58,42 @@ public class ArimPermsPlugin implements ArimPerms {
 		data = new Data(this);
 		config = new Config(this);
 		messages = new Messages(this);
+		getRegistry().register(PermissionsPlugin.class, this);
 	}
 	
 	@Override
 	public Registry getRegistry() {
-		return options.registry;
+		return registry;
+	}
+	
+	@Override
+	public String getName() {
+		return information.getName();
+	}
+	
+	@Override
+	public String getAuthor() {
+		return information.getAuthors().length > 0 ? information.getAuthors()[0] : ArimPerms.super.getAuthor();
+	}
+	
+	@Override
+	public String getVersion() {
+		return information.getVersion();
+	}
+	
+	@Override
+	public byte getPriority() {
+		return RegistryPriority.LOWER;
 	}
 	
 	@Override
 	public File getFolder() {
-		return options.folder;
+		return folder;
 	}
 	
 	@Override
 	public boolean isOnlineMode() {
-		return options.onlineMode;
+		return onlineMode;
 	}
 
 	@Override
