@@ -37,7 +37,7 @@ import space.arim.universal.util.collections.CollectionsUtil;
  * @author A248
  *
  */
-public interface Group {
+public interface Group extends Permissible {
 
 	/**
 	 * Gets the ID of this group. Should be unique
@@ -144,6 +144,7 @@ public interface Group {
 	 * @param permission the permission
 	 * @return true if and only if the group has the permission
 	 */
+	@Override
 	default boolean hasPermission(String permission) {
 		return hasPermission(permission, null);
 	}
@@ -155,6 +156,7 @@ public interface Group {
 	 * @param category the category
 	 * @return true if and only if the group has the permission
 	 */
+	@Override
 	default boolean hasPermission(String permission, @Nullable String category) {
 		return CollectionsUtil.checkForAnyMatches(getEffectiveParents(), (parent) -> parent.getPermissions(category).contains(permission));
 	}

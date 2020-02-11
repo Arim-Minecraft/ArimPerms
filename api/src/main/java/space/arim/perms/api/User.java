@@ -35,7 +35,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * @author A248
  *
  */
-public interface User {
+public interface User extends Permissible {
 
 	/**
 	 * Gets the ID of this user. Should be unique
@@ -90,6 +90,7 @@ public interface User {
 	 * @param permission the permission
 	 * @return true if and only if the user has the permission
 	 */
+	@Override
 	default boolean hasPermission(String permission) {
 		return hasPermission(permission, null);
 	}
@@ -101,6 +102,7 @@ public interface User {
 	 * @param category the category
 	 * @return true if and only if the user has the permission
 	 */
+	@Override
 	default boolean hasPermission(String permission, @Nullable String category) {
 		return getEffectivePermissions(category).contains(permission);
 	}
