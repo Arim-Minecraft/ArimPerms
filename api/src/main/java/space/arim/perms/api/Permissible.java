@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * Anything which may hold permissions. <br>
  * <br>
  * <b>Specifications</b>: <br>
- * * {@link #getId()} must return a unique group ID. <br>
+ * * {@link #getId()} must return a unique ID. <br>
  * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code> <br>
  * * <code>{@link #hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> 
  * 
