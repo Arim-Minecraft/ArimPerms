@@ -42,6 +42,7 @@ public interface User extends Permissible {
 	 * 
 	 * @return the String based id
 	 */
+	@Override
 	String getId();
 	
 	/**

@@ -21,7 +21,12 @@ package space.arim.perms.api;
 import org.eclipse.jdt.annotation.Nullable;
 
 /**
- * Anything which may hold permissions.
+ * Anything which may hold permissions. <br>
+ * <br>
+ * <b>Specifications</b>: <br>
+ * * {@link #getId()} must return a unique group ID. <br>
+ * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code> <br>
+ * * <code>{@link #hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> 
  * 
  * @author A248
  *
@@ -50,5 +55,12 @@ public interface Permissible {
 	 * @return true if and only if the permission holder has the permission
 	 */
 	boolean hasPermission(String permission, @Nullable String category);
+	
+	/**
+	 * Gets the ID of this Permissible. Should be unique
+	 * 
+	 * @return the String based id
+	 */
+	String getId();
 	
 }
