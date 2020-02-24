@@ -23,8 +23,8 @@ import java.util.UUID;
 import org.eclipse.jdt.annotation.Nullable;
 
 import space.arim.universal.registry.Registry;
+import space.arim.universal.registry.RequireRegistration;
 
-import space.arim.api.annotation.RequireRegistration;
 import space.arim.api.concurrent.AsyncExecution;
 import space.arim.api.concurrent.SyncExecution;
 import space.arim.api.uuid.UUIDResolver;
