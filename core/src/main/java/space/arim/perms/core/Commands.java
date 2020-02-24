@@ -21,6 +21,7 @@ package space.arim.perms.core;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -143,8 +144,8 @@ public class Commands implements CommandManager {
 					recalcUserPerms(user);
 					sendMessage(sender, core.messages().getString("cmds.user.update.recalc").replace("%USER%", args[1]));
 				} else if (args[3].equalsIgnoreCase("list")) {
-					Group[] groups = user.getGroups();
-					sendMessage(sender, core.messages().getString("cmds.user.info.list." + (groups.length > 0 ? "list" : "none")).replace("%USER%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(groups, (group) -> group.getId()), ',')));
+					Set<Group> groups = user.getGroups();
+					sendMessage(sender, core.messages().getString("cmds.user.info.list." + (groups.size() > 0 ? "list" : "none")).replace("%USER%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(groups.toArray(new Group[] {}), (group) -> group.getId()), ',')));
 				} else if (args[3].equalsIgnoreCase("list-perms")) {
 					String category = (args.length > 3) ? args[3] : null;
 					String categoryMsg = (category == null) ? core.messages().getString("cmds.category.general") : core.messages().getString("cmds.category.for-specific").replace("%CATEGORY%", category);
@@ -251,8 +252,8 @@ public class Commands implements CommandManager {
 				Collection<String> users = getUsersInGroup(group).map((user) -> user.getId()).collect(Collectors.toSet());
 				sendMessage(sender, core.messages().getString("cmds.user.info.list-users." + (!users.isEmpty() ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(users, ',')));
 			} else if (args[3].equalsIgnoreCase("list-parents")) {
-				Group[] parents = group.getParents();
-				sendMessage(sender, core.messages().getString("cmds.user.info.list-parents." + (parents.length > 0 ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(parents, (parent) -> parent.getId()), ',')));
+				Set<Group> parents = group.getParents();
+				sendMessage(sender, core.messages().getString("cmds.user.info.list-parents." + (parents.size() > 0 ? "list" : "none")).replace("%GROUP%", args[1]).replace("%LIST%", StringsUtil.concat(CollectionsUtil.convertAll(parents.toArray(new Group[] {}), (parent) -> parent.getId()), ',')));
 			} else {
 				sendMessage(sender, core.messages().getString("cmds.group.usage").replace("%GROUP%", args[1]));
 			}

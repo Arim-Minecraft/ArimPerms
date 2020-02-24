@@ -26,22 +26,26 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import space.arim.universal.util.collections.ArraysUtil;
-
 import space.arim.perms.api.Group;
 
 public class GroupInfo implements Group {
 
 	private final String id;
-	private Group[] parents;
+	
+	private final Set<Group> parents = ConcurrentHashMap.newKeySet();
+	private Set<Group> parentsView;
 	
 	private final ConcurrentHashMap<String, Set<String>> permissions = new ConcurrentHashMap<String, Set<String>>();
 	
 	private Set<Group> effective;
 	
-	public GroupInfo(String id, Group...parents) {
+	GroupInfo(String id) {
 		this.id = id;
-		this.parents = parents;
+	}
+	
+	GroupInfo(String id, Collection<Group> parents) {
+		this(id);
+		this.parents.addAll(parents);
 	}
 	
 	@Override
@@ -50,8 +54,8 @@ public class GroupInfo implements Group {
 	}
 	
 	@Override
-	public Group[] getParents() {
-		return parents;
+	public Set<Group> getParents() {
+		return (parentsView != null) ? parentsView : (parentsView = Collections.unmodifiableSet(parents));
 	}
 	
 	@Override
@@ -69,8 +73,9 @@ public class GroupInfo implements Group {
 		return Collections.unmodifiableSet(permissions.keySet());
 	}
 	
-	void setParents(Group[] parents) {
-		this.parents = parents;
+	void setParents(Collection<Group> parents) {
+		this.parents.addAll(parents);
+		this.parents.retainAll(parents);
 	}
 	
 	/**
@@ -125,16 +130,12 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean addParent(Group parent) {
-		Group[] previous = parents;
-		parents = ArraysUtil.addIfNotPresent(previous, parent);
-		return parents != previous;
+		return parents.add(parent);
 	}
 	
 	@Override
 	public boolean removeParent(Group parent) {
-		Group[] previous = parents;
-		parents = ArraysUtil.remove(parents, parent);
-		return parents != previous;
+		return parents.remove(parent);
 	}
 	
 	private static void addGroupsRecursive(Set<Group> existing, Group group, int recursion) {

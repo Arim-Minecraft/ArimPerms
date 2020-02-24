@@ -26,21 +26,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 
-import space.arim.universal.util.collections.ArraysUtil;
-
 import space.arim.perms.api.Group;
 import space.arim.perms.api.User;
 
 public class UserInfo implements User {
 
 	private final String id;
-	private Group[] groups;
+	
+	private final Set<Group> groups = ConcurrentHashMap.newKeySet();
+	private Set<Group> groupsView;
 	
 	private final ConcurrentHashMap<String, Set<String>> effective = new ConcurrentHashMap<String, Set<String>>();
 	
-	UserInfo(String id, Group...groups){
+	UserInfo(String id){
 		this.id = id;
-		this.groups = groups;
+	}
+	
+	UserInfo(String id, Collection<Group> groups){
+		this(id);
+		this.groups.addAll(groups);
 	}
 	
 	@Override
@@ -49,8 +53,8 @@ public class UserInfo implements User {
 	}
 	
 	@Override
-	public Group[] getGroups() {
-		return groups;
+	public Set<Group> getGroups() {
+		return (groupsView != null) ? groupsView : (groupsView = Collections.unmodifiableSet(groups));
 	}
 	
 	@Override
@@ -58,22 +62,19 @@ public class UserInfo implements User {
 		return effective.getOrDefault(category, Collections.emptySet());
 	}
 	
-	void setGroups(Group[] groups) {
-		this.groups = groups;
+	void setGroups(Collection<Group> groups) {
+		this.groups.addAll(groups);
+		this.groups.retainAll(groups);
 	}
 	
 	@Override
 	public boolean addGroup(Group group) {
-		Group[] previous = groups;
-		groups = ArraysUtil.addIfNotPresent(previous, group);
-		return groups != previous;
+		return groups.add(group);
 	}
 	
 	@Override
 	public boolean removeGroup(Group group) {
-		Group[] previous = groups;
-		groups = ArraysUtil.remove(previous, group);
-		return groups != previous;
+		return groups.remove(group);
 	}
 	
 	@Override

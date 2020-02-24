@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import space.arim.universal.util.collections.CollectionsUtil;
@@ -192,7 +193,9 @@ public class Data implements DataManager {
 	}
 	
 	private static String getParents(Group group) {
-		return StringsUtil.concat(CollectionsUtil.convertAll(group.getParents(), (parent) -> parent.getId()), ',');
+		StringBuilder builder = new StringBuilder();
+		group.getParents().forEach((parent) -> builder.append(',').append(parent.getId()));
+		return builder.substring(1);
 	}
 	
 	private static String getPermissions(Group group) {
@@ -200,12 +203,14 @@ public class Data implements DataManager {
 	}
 	
 	private static String getGroups(User user) {
-		return StringsUtil.concat(CollectionsUtil.convertAll(user.getGroups(), (group) -> group.getId()), ','); 
+		StringBuilder builder = new StringBuilder();
+		user.getGroups().forEach((group) -> builder.append(',').append(group.getId()));
+		return builder.substring(1);
 	}
 	
 	private void addGroupFromRaw(RawGroup groupData) {
 		
-		Group[] parents = CollectionsUtil.convertAll(groupData.getParents().split(","), core.groups()::getGroup);
+		Stream<Group> parents = Arrays.stream(groupData.getParents().split(",")).map(core.groups()::getGroup);
 		HashMap<String, Set<String>> categoryPermissions = new HashMap<String, Set<String>>();
 		
 		for (String categoryInfo : groupData.getPermissions().split(",")) {
@@ -218,25 +223,21 @@ public class Data implements DataManager {
 		Group group = core.groups().getGroup(groupData.getId());
 		if (group instanceof GroupInfo) {
 			GroupInfo groupInfo = (GroupInfo) group;
-			groupInfo.setParents(parents);
+			groupInfo.setParents(parents.collect(Collectors.toSet()));
 			categoryPermissions.forEach(groupInfo::setPermissions);
 		} else {
-			for (Group parent : parents) {
-				group.addParent(parent);
-			}
+			parents.forEach(group::addParent);
 			categoryPermissions.forEach(group::addPermissions);
 		}
 	}
 	
 	private void addUserFromRaw(RawUser userData) {
-		Group[] groups = CollectionsUtil.convertAll(userData.getGroups().split(","), core.groups()::getGroup);
+		Stream<Group> groups = Arrays.stream(userData.getGroups().split(",")).map(core.groups()::getGroup);
 		User user = core.users().getUser(userData.getId());
 		if (user instanceof UserInfo) {
-			((UserInfo) user).setGroups(groups);
+			((UserInfo) user).setGroups(groups.collect(Collectors.toSet()));
 		} else {
-			for (Group group : groups) {
-				user.addGroup(group);
-			}
+			groups.forEach(user::addGroup);
 		}
 	}
 	

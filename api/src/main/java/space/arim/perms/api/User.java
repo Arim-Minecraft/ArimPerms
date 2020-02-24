@@ -19,6 +19,7 @@
 package space.arim.perms.api;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -46,12 +47,11 @@ public interface User extends Permissible {
 	String getId();
 	
 	/**
-	 * Gets groups from which this user inherits. <br>
-	 * The returned array is a copy; modifying it will not affect this User.
+	 * Gets a backed set of groups from which this user inherits.
 	 * 
-	 * @return all applicable groups
+	 * @return an immutable <i>view</i> of all applicable groups
 	 */
-	Group[] getGroups();
+	Set<Group> getGroups();
 	
 	/**
 	 * Adds this user to the specified group.
