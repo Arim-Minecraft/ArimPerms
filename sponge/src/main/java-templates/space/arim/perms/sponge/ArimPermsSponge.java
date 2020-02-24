@@ -78,6 +78,7 @@ public class ArimPermsSponge extends DecoupledCommand {
 	@Listener
 	public void onEnable(@SuppressWarnings("unused") GamePreInitializationEvent evt) {
 		
+		// TODO Remove warning when Sponge PermissionsService implementation is completed
 		getPlugin().getLogger().error("The Sponge branch of ArimPerms is still in development! This plugin will BARELY work! A248 (the plugin author) is not responsible for any damages which may occur.");
 		
 		Logger logger = Logger.getLogger("${plugin.spongeid}");
