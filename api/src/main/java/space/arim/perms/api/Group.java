@@ -48,7 +48,8 @@ public interface Group extends Permissible {
 	String getId();
 	
 	/**
-	 * Gets groups from which this group inherits.
+	 * Gets groups from which this group inherits. <br>
+	 * The returned array is a copy; modifying it will not affect this Group.
 	 * 
 	 * @return all parent groups
 	 */

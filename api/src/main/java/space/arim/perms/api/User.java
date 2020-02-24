@@ -46,7 +46,8 @@ public interface User extends Permissible {
 	String getId();
 	
 	/**
-	 * Gets groups from which this user inherits
+	 * Gets groups from which this user inherits. <br>
+	 * The returned array is a copy; modifying it will not affect this User.
 	 * 
 	 * @return all applicable groups
 	 */
