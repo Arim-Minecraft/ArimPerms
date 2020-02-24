@@ -77,12 +77,16 @@ public class ArimPermsSponge extends DecoupledCommand {
 	
 	@Listener
 	public void onEnable(@SuppressWarnings("unused") GamePreInitializationEvent evt) {
+		
+		getPlugin().getLogger().error("The Sponge branch of ArimPerms is still in development! This plugin will BARELY work! A248 (the plugin author) is not responsible for any damages which may occur.");
+		
 		Logger logger = Logger.getLogger("${plugin.spongeid}");
 		logger.setParent(Logger.getLogger(""));
 		core = new ArimPermsPlugin(UniversalRegistry.get(), PluginInformation.getForSponge(getPlugin()), new PluginEnvOptions(folder, logger, Sponge.getServer().getOnlineMode()));
 		core.reload(true);
 		Sponge.getServiceManager().setProvider(this, PermissionService.class, new SpongeHook(core));
 		Sponge.getCommandManager().register(this, this, "arimperms", "ap");
+		
 	}
 	
 	@Listener
