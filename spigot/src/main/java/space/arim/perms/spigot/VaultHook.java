@@ -350,7 +350,7 @@ public class VaultHook extends Permission {
 			core.logs().verbose(core.config().getBoolean("bad-plugins.stringly-players.log-calls.log-caller-class") ? "An outdated plugin (" + getCallerClass() + ") called a deprecated method. Consider updating it." : "An outdated plugin called a deprecated method. Consider updating it.");
 		}
 		UUID uuid = getPossibleId(player);
-		return uuid != null ? CollectionsUtil.convertAll(getByUUID(uuid).getGroups(), (group) -> group.getId()) : new String[] {};
+		return uuid != null ? getByUUID(uuid).getGroups().stream().map((group) -> group.getId()).toArray(String[]::new) : new String[] {};
 	}
 	
 	@Override
@@ -361,7 +361,7 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public String[] getPlayerGroups(String world, OfflinePlayer player) {
-		return CollectionsUtil.convertAll(getByPlayer(player).getGroups(), (group) -> group.getId());
+		return getByPlayer(player).getGroups().stream().map((group) -> group.getId()).toArray(String[]::new);
 	}
 	
 	@Override
@@ -369,21 +369,14 @@ public class VaultHook extends Permission {
 		return getPlayerGroups(player.getWorld().getName(), player);
 	}
 	
-	private String getPrimaryGroup(UUID uuid) {
-		Group[] groups = getByUUID(uuid).getGroups();
-		return groups.length > 0 ? groups[0].getId() : "";
-	}
-	
 	@Override
 	@Deprecated
 	public String getPrimaryGroup(String world, String player) {
-		if (!core.config().getBoolean("bad-plugins.stringly-players.enable-compatibility")) {
-			return "";
-		} else if (core.config().getBoolean("bad-plugins.stringly-players.log-calls.enable")) {
+		if (core.config().getBoolean("bad-plugins.stringly-players.log-calls.enable")) {
 			core.logs().verbose(core.config().getBoolean("bad-plugins.stringly-players.log-calls.log-caller-class") ? "An outdated plugin (" + getCallerClass() + ") called a deprecated method. Consider updating it." : "An outdated plugin called a deprecated method. Consider updating it.");
 		}
-		UUID uuid = getPossibleId(player);
-		return uuid == null ? "" : getPrimaryGroup(uuid);
+		// ArimPerms does not implement anything such as a "primary group"
+		return "";
 	}
 	
 	@Override
@@ -394,12 +387,12 @@ public class VaultHook extends Permission {
 	
 	@Override
 	public String getPrimaryGroup(String world, OfflinePlayer player) {
-		return getPrimaryGroup(player.getUniqueId());
+		return "";
 	}
 	
 	@Override
 	public String getPrimaryGroup(Player player) {
-		return getPrimaryGroup(player.getUniqueId());
+		return "";
 	}
 	
 	@Override
