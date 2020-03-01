@@ -25,7 +25,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import space.arim.api.server.LogFormatter;
+import space.arim.api.util.ConciseLogFormatter;
 import space.arim.api.util.FilesUtil;
 
 import space.arim.perms.api.ArimPerms;
@@ -114,10 +114,10 @@ public class Logs implements LogManager {
 				verboseLog = new FileHandler(path + File.separator + "verbose.log");
 				infoLog = new FileHandler(path + File.separator + "info.log");
 				errorLog = new FileHandler(path + File.separator + "error.log");
-				Formatter universalFormatter = new LogFormatter();
-				verboseLog.setFormatter(universalFormatter);
-				infoLog.setFormatter(universalFormatter);
-				errorLog.setFormatter(universalFormatter);
+				Formatter formatter = new ConciseLogFormatter();
+				verboseLog.setFormatter(formatter);
+				infoLog.setFormatter(formatter);
+				errorLog.setFormatter(formatter);
 				verboseLog.setLevel(Level.ALL);
 				infoLog.setLevel(Level.CONFIG);
 				errorLog.setLevel(Level.WARNING);
