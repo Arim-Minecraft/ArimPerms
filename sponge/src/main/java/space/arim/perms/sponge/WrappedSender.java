@@ -20,7 +20,7 @@ package space.arim.perms.sponge;
 
 import org.spongepowered.api.command.CommandSource;
 
-import space.arim.api.server.sponge.SpongeUtil;
+import space.arim.api.platform.sponge.SpongeMessages;
 
 import space.arim.perms.api.CmdSender;
 
@@ -39,7 +39,7 @@ class WrappedSender implements CmdSender {
 	
 	@Override
 	public void sendMessage(String message) {
-		sender.sendMessage(SpongeUtil.colour(message));
+		sender.sendMessage(SpongeMessages.get().colour(message));
 	}
 	
 }

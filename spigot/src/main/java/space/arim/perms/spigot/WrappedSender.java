@@ -20,6 +20,8 @@ package space.arim.perms.spigot;
 
 import org.bukkit.command.CommandSender;
 
+import space.arim.api.platform.spigot.SpigotMessages;
+
 import space.arim.perms.api.CmdSender;
 
 class WrappedSender implements CmdSender {
@@ -34,10 +36,10 @@ class WrappedSender implements CmdSender {
 	public boolean hasPermission(String permission) {
 		return sender.hasPermission(permission);
 	}
-
+	
 	@Override
 	public void sendMessage(String message) {
-		sender.sendMessage(message);
+		sender.sendMessage(SpigotMessages.get().transformFormattingCodes(message));
 	}
 	
 }

@@ -41,11 +41,11 @@ import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.concurrent.AsyncExecution;
 import space.arim.api.concurrent.SyncExecution;
-import space.arim.api.server.PluginInformation;
-import space.arim.api.server.sponge.DecoupledCommand;
-import space.arim.api.server.sponge.DefaultAsyncExecution;
-import space.arim.api.server.sponge.DefaultSyncExecution;
-import space.arim.api.server.sponge.DefaultUUIDResolver;
+import space.arim.api.platform.sponge.DecoupledCommand;
+import space.arim.api.platform.sponge.DefaultAsyncExecution;
+import space.arim.api.platform.sponge.DefaultSyncExecution;
+import space.arim.api.platform.sponge.DefaultUUIDResolver;
+import space.arim.api.platform.sponge.SpongePlatform;
 import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;
@@ -83,7 +83,7 @@ public class ArimPermsSponge extends DecoupledCommand {
 		
 		Logger logger = Logger.getLogger("${plugin.spongeid}");
 		logger.setParent(Logger.getLogger(""));
-		core = new ArimPermsPlugin(UniversalRegistry.get(), PluginInformation.getForSponge(getPlugin()), new PluginEnvOptions(folder, logger, Sponge.getServer().getOnlineMode()));
+		core = new ArimPermsPlugin(UniversalRegistry.get(), SpongePlatform.get().convertPluginInfo(getPlugin()), new PluginEnvOptions(folder, logger, Sponge.getServer().getOnlineMode()));
 		core.reload(true);
 		Sponge.getServiceManager().setProvider(this, PermissionService.class, new SpongeHook(core));
 		Sponge.getCommandManager().register(this, this, "arimperms", "ap");

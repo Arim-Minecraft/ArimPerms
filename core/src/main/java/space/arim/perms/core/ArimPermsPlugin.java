@@ -24,7 +24,7 @@ import space.arim.universal.registry.Registry;
 import space.arim.universal.registry.RegistryPriority;
 
 import space.arim.api.config.SimpleConfigFramework;
-import space.arim.api.server.PluginInformation;
+import space.arim.api.platform.PluginInformation;
 import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;

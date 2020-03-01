@@ -20,7 +20,7 @@ package space.arim.perms.bungee;
 
 import net.md_5.bungee.api.CommandSender;
 
-import space.arim.api.server.bungee.BungeeUtil;
+import space.arim.api.platform.bungee.BungeeMessages;
 
 import space.arim.perms.api.CmdSender;
 
@@ -39,7 +39,7 @@ public class WrappedSender implements CmdSender {
 	
 	@Override
 	public void sendMessage(String message) {
-		sender.sendMessage(BungeeUtil.colour(message));
+		sender.sendMessage(BungeeMessages.get().colour(message));
 	}
 	
 }

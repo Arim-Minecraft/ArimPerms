@@ -26,10 +26,10 @@ import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.concurrent.AsyncExecution;
 import space.arim.api.concurrent.SyncExecution;
-import space.arim.api.server.PluginInformation;
-import space.arim.api.server.bungee.DefaultAsyncExecution;
-import space.arim.api.server.bungee.DefaultSyncExecution;
-import space.arim.api.server.bungee.DefaultUUIDResolver;
+import space.arim.api.platform.bungee.BungeePlatform;
+import space.arim.api.platform.bungee.DefaultAsyncExecution;
+import space.arim.api.platform.bungee.DefaultSyncExecution;
+import space.arim.api.platform.bungee.DefaultUUIDResolver;
 import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;
@@ -50,7 +50,7 @@ public class ArimPermsBungee extends Plugin {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
-		core = new ArimPermsPlugin(UniversalRegistry.get(), PluginInformation.getForBungee(getDescription()), new PluginEnvOptions(getDataFolder(), getLogger(), getProxy().getConfig().isOnlineMode()));
+		core = new ArimPermsPlugin(UniversalRegistry.get(), BungeePlatform.get().convertPluginInfo(this), new PluginEnvOptions(getDataFolder(), getLogger(), getProxy().getConfig().isOnlineMode()));
 		core.reload(true);
 		getProxy().getPluginManager().registerListener(this, new PlayerListener(this));
 		getProxy().getPluginManager().registerCommand(this, new Command("arimperms", "ap") {

@@ -31,10 +31,10 @@ import space.arim.universal.registry.UniversalRegistry;
 
 import space.arim.api.concurrent.AsyncExecution;
 import space.arim.api.concurrent.SyncExecution;
-import space.arim.api.server.PluginInformation;
-import space.arim.api.server.bukkit.DefaultAsyncExecution;
-import space.arim.api.server.bukkit.DefaultSyncExecution;
-import space.arim.api.server.bukkit.DefaultUUIDResolver;
+import space.arim.api.platform.spigot.SpigotPlatform;
+import space.arim.api.platform.spigot.DefaultAsyncExecution;
+import space.arim.api.platform.spigot.DefaultSyncExecution;
+import space.arim.api.platform.spigot.DefaultUUIDResolver;
 import space.arim.api.uuid.UUIDResolver;
 
 import space.arim.perms.api.ArimPerms;
@@ -74,7 +74,7 @@ public class ArimPermsSpigot extends JavaPlugin {
 			throw new IllegalStateException("Your server is not running CraftBukkit or Glowstone. Please contact A248 (a248@arim.space) to update ArimPerms for your server version.");
 		}
 		playerField.setAccessible(true);
-		core = new ArimPermsPlugin(UniversalRegistry.get(), PluginInformation.getForSpigot(getDescription()), new PluginEnvOptions(getDataFolder(), getLogger(), getServer().getOnlineMode()));
+		core = new ArimPermsPlugin(UniversalRegistry.get(), SpigotPlatform.get().convertPluginInfo(this), new PluginEnvOptions(getDataFolder(), getLogger(), getServer().getOnlineMode()));
 		core.reload(true);
 		getServer().getServicesManager().register(Permission.class, new VaultHook(this, core), this, ServicePriority.High);
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
