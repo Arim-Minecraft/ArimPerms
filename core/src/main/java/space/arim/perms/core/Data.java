@@ -195,7 +195,7 @@ public class Data implements DataManager {
 	private static String getParents(Group group) {
 		StringBuilder builder = new StringBuilder();
 		group.getParents().forEach((parent) -> builder.append(',').append(parent.getId()));
-		return builder.substring(1);
+		return (builder.length() == 0) ? "" : builder.substring(1);
 	}
 	
 	private static String getPermissions(Group group) {
