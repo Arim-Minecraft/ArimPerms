@@ -86,6 +86,13 @@ public class GroupInfo implements Group {
 		return (categoriesView != null) ? categoriesView : (categoriesView = Collections.unmodifiableSet(permissions.keySet()));
 	}
 	
+	/**
+	 * Sets the direct parent groups of this Group to those in given collection <br>
+	 * Unlike {@link #setPermissions(String, Set)}, the specified collection parameter need have no contract.
+	 * The collection is read, the groups are added, and the collection is discarded.
+	 * 
+	 * @param parents the parent groups
+	 */
 	void setParents(Collection<Group> parents) {
 		this.parents.addAll(parents);
 		this.parents.retainAll(parents);
@@ -106,12 +113,12 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public boolean addPermission(String permission, @Nullable String category) {
-		return permissions.computeIfAbsent(category, (w) -> ConcurrentHashMap.newKeySet()).add(permission);
+		return permissions.computeIfAbsent(category, (c) -> ConcurrentHashMap.newKeySet()).add(permission);
 	}
 	
 	@Override
 	public boolean addPermissions(@Nullable String category, Collection<String> permissions) {
-		return this.permissions.computeIfAbsent(category, (w) -> ConcurrentHashMap.newKeySet()).addAll(permissions);
+		return this.permissions.computeIfAbsent(category, (c) -> ConcurrentHashMap.newKeySet()).addAll(permissions);
 	}
 	
 	@Override
@@ -152,18 +159,17 @@ public class GroupInfo implements Group {
 	}
 	
 	private static void addGroupsRecursive(Set<Group> existing, Group group, int recursion) {
-		if (recursion > ArimPermsPlugin.MAX_RECURSION_DEPTH) {
-			return;
-			//throw new IllegalStateException("Group recursion checking entered depth " + ArimPermsPlugin.MAX_RECURSION_DEPTH + "!");
-		}
-		existing.add(group);
-		for (Group parent : group.getParents()) {
-			addGroupsRecursive(existing, parent, ++recursion);
+		if (recursion < ArimPermsPlugin.MAX_RECURSION_DEPTH) {
+			existing.add(group);
+			for (Group parent : group.getParents()) {
+				addGroupsRecursive(existing, parent, ++recursion);
+			}
 		}
 	}
 	
 	@Override
 	public void recalculate() {
+		// HashSet can be read from, but not written to, concurrently
 		Set<Group> groups = new HashSet<Group>();
 		addGroupsRecursive(groups, this, 0);
 		effective = Collections.unmodifiableSet(groups);
