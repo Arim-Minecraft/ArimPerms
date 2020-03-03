@@ -33,7 +33,6 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.service.permission.PermissionService;
 
 import com.google.inject.Inject;
 
@@ -76,23 +75,21 @@ public class ArimPermsSponge extends DecoupledCommand {
 	}
 	
 	@Listener
-	public void onEnable(@SuppressWarnings("unused") GamePreInitializationEvent evt) {
-		
-		// TODO Remove warning when Sponge PermissionsService implementation is completed
-		getPlugin().getLogger().error("The Sponge branch of ArimPerms is still in development! This plugin will BARELY work! A248 (the plugin author) is not responsible for any damages which may occur.");
-		
+	public void onEnable(@SuppressWarnings("unused") GamePreInitializationEvent evt) {		
 		Logger logger = Logger.getLogger("${plugin.spongeid}");
 		logger.setParent(Logger.getLogger(""));
 		core = new ArimPermsPlugin(UniversalRegistry.get(), SpongePlatform.get().convertPluginInfo(getPlugin()), new PluginEnvOptions(folder, logger, Sponge.getServer().getOnlineMode()));
 		core.reload(true);
-		Sponge.getServiceManager().setProvider(this, PermissionService.class, new SpongeHook(core));
+		Sponge.getEventManager().registerListeners(this, new PlayerListener(this));
 		Sponge.getCommandManager().register(this, this, "arimperms", "ap");
-		
+		// TODO Fully implement PermissionsService
+		// Sponge.getServiceManager().setProvider(this, PermissionService.class, new SpongeHook(core));
 	}
 	
 	@Listener
 	public void onDisable(@SuppressWarnings("unused") GameStoppingServerEvent evt) {
 		core.close();
+		Sponge.getEventManager().unregisterPluginListeners(this);
 	}
 	
 	@Override
