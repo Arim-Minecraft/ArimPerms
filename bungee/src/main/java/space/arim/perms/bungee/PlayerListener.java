@@ -22,8 +22,6 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PermissionCheckEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -39,7 +37,9 @@ class PlayerListener implements Listener {
 	
 	@EventHandler(priority = Byte.MIN_VALUE)
 	private void onLogin(LoginEvent evt) {
-		plugin.core.getUserByUUID(evt.getConnection().getUniqueId()).recalculate();
+		User user = plugin.core.getUserByUUID(evt.getConnection().getUniqueId());
+		user.recalculate();
+		plugin.getProxy().getServers().keySet().forEach(user::recalculate);
 	}
 	
 	@EventHandler(priority = Byte.MIN_VALUE)
@@ -50,16 +50,6 @@ class PlayerListener implements Listener {
 			User user = plugin.core.getUserByUUID(player.getUniqueId());
 			evt.setHasPermission(user.hasPermission(evt.getPermission()) || user.hasPermission(evt.getPermission(), player.getServer().getInfo().getName()));
 		}
-	}
-	
-	@EventHandler(priority = Byte.MIN_VALUE)
-	private void onPostLogin(PostLoginEvent evt) {
-		plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getPlayer().getServer().getInfo().getName());
-	}
-	
-	@EventHandler(priority = Byte.MIN_VALUE)
-	private void onServerChange(ServerConnectEvent evt) {
-		plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getTarget().getName());
 	}
 	
 }

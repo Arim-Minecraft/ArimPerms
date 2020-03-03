@@ -26,7 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import space.arim.perms.api.User;
 
 class PlayerListener implements Listener {
 
@@ -38,23 +38,17 @@ class PlayerListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onPreLogin(AsyncPlayerPreLoginEvent evt) {
-		plugin.core.getUserByUUID(evt.getUniqueId()).recalculate();
+		User user = plugin.core.getUserByUUID(evt.getUniqueId());
+		user.recalculate();
+		plugin.getServer().getWorlds().forEach((world) -> user.recalculate(world.getName()));
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onLogin(PlayerLoginEvent evt) {
-		plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getPlayer().getWorld().getName());
 		try {
 			plugin.getInjector(evt.getPlayer()).inject(plugin.getInjection(evt.getPlayer()));
 		} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
 			plugin.getLogger().log(Level.WARNING, "Could not inject permissible for " + evt.getPlayer().getName() + "!", ex);
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.LOWEST)
-	private void onWorldChange(PlayerTeleportEvent evt) {
-		if (!evt.getFrom().getWorld().getName().equals(evt.getTo().getWorld().getName())) {
-			plugin.core.getUserByUUID(evt.getPlayer().getUniqueId()).recalculate(evt.getTo().getWorld().getName());
 		}
 	}
 	
