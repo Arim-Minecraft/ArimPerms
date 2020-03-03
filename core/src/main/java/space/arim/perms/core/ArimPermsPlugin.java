@@ -32,7 +32,7 @@ import space.arim.perms.api.PermissionsPlugin;
 
 public class ArimPermsPlugin implements ArimPerms {
 
-	static final int MAX_RECURSION_DEPTH = 32;
+	static final int MAX_RECURSION_DEPTH = 64;
 	
 	private final Registry registry;
 	private final PluginInformation information;
