@@ -33,11 +33,12 @@ public class GroupInfo implements Group {
 	private final String id;
 	
 	private final Set<Group> parents = ConcurrentHashMap.newKeySet();
-	private Set<Group> parentsView;
+	private volatile Set<Group> parentsView;
 	
 	private final ConcurrentHashMap<String, Set<String>> permissions = new ConcurrentHashMap<String, Set<String>>();
+	private volatile Set<String> categoriesView;
 	
-	private Set<Group> effective;
+	private volatile Set<Group> effective;
 	
 	GroupInfo(String id) {
 		this.id = id;
@@ -58,6 +59,18 @@ public class GroupInfo implements Group {
 		return (parentsView != null) ? parentsView : (parentsView = Collections.unmodifiableSet(parents));
 	}
 	
+	/**
+	 * Directly gets the permissions of the group for the category. <br>
+	 * May return <code>null</code> if not set.
+	 * 
+	 * @param category the category
+	 * @return the permissions for that category
+	 */
+	@Nullable
+	Collection<String> getMutablePermissions(@Nullable String category) {
+		return permissions.get(category);
+	}
+	
 	@Override
 	public Collection<String> getPermissions(@Nullable String category) {
 		return Collections.unmodifiableSet(permissions.getOrDefault(category, Collections.emptySet()));
@@ -70,7 +83,7 @@ public class GroupInfo implements Group {
 	
 	@Override
 	public Collection<String> getCategories() {
-		return Collections.unmodifiableSet(permissions.keySet());
+		return (categoriesView != null) ? categoriesView : (categoriesView = Collections.unmodifiableSet(permissions.keySet()));
 	}
 	
 	void setParents(Collection<Group> parents) {
