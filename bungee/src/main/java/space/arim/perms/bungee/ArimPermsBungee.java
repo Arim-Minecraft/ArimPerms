@@ -63,4 +63,10 @@ public class ArimPermsBungee extends Plugin {
 		});
 	}
 	
+	@Override
+	public void onDisable() {
+		core.close();
+		getProxy().getPluginManager().unregisterListeners(this);
+	}
+	
 }

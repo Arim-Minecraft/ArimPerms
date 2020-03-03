@@ -24,6 +24,7 @@ import java.util.Objects;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -83,6 +84,7 @@ public class ArimPermsSpigot extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		core.close();
+		HandlerList.unregisterAll(this);
 	}
 	
 	@Override
