@@ -16,7 +16,7 @@
  * along with ArimPerms-sponge. If not, see <https://www.gnu.org/licenses/>
  * and navigate to version 3 of the GNU General Public License.
  */
-package space.arim.perms.sponge;
+package space.arim.perms.sponge.hook;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,10 +37,16 @@ import space.arim.perms.api.User;
 
 public class SpongeUser implements Subject {
 
+	private final SpongeHook hook;
 	private final User user;
+	private final SubjectCollection collection;
+	private final SubjectReference reference;
 	
-	SpongeUser(User user) {
+	SpongeUser(SpongeHook hook, User user, SubjectCollection collection) {
+		this.hook = hook;
 		this.user = user;
+		this.collection = collection;
+		reference = new SubjRef(hook, collection, this);
 	}
 	
 	@Override
@@ -52,10 +58,10 @@ public class SpongeUser implements Subject {
 	public String getIdentifier() {
 		return user.getId();
 	}
-
+	
 	@Override
 	public SubjectReference asSubjectReference() {
-		return null;
+		return reference;
 	}
 	
 	@Override
@@ -70,19 +76,19 @@ public class SpongeUser implements Subject {
 	
 	@Override
 	public SubjectCollection getContainingCollection() {
-		return null;
+		return collection;
 	}
-
+	
 	@Override
 	public Optional<String> getOption(Set<Context> contexts, String key) {
 		return null;
 	}
-
+	
 	@Override
 	public List<SubjectReference> getParents(Set<Context> contexts) {
 		return null;
 	}
-
+	
 	@Override
 	public Tristate getPermissionValue(Set<Context> contexts, String permission) {
 		return null;
