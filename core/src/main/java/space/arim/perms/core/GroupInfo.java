@@ -67,7 +67,7 @@ public class GroupInfo implements Group {
 	 * @return the permissions for that category
 	 */
 	@Nullable
-	Collection<String> getMutablePermissions(@Nullable String category) {
+	Set<String> getMutablePerms(@Nullable String category) {
 		return permissions.get(category);
 	}
 	
@@ -153,7 +153,8 @@ public class GroupInfo implements Group {
 	
 	private static void addGroupsRecursive(Set<Group> existing, Group group, int recursion) {
 		if (recursion > ArimPermsPlugin.MAX_RECURSION_DEPTH) {
-			throw new IllegalStateException("Group recursion checking entered depth " + ArimPermsPlugin.MAX_RECURSION_DEPTH + "!");
+			return;
+			//throw new IllegalStateException("Group recursion checking entered depth " + ArimPermsPlugin.MAX_RECURSION_DEPTH + "!");
 		}
 		existing.add(group);
 		for (Group parent : group.getParents()) {
