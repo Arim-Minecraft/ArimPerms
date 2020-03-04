@@ -84,13 +84,14 @@ public class UserInfo implements User {
 	
 	@Override
 	public void recalculate(@Nullable String category) {
-		Set<String> effective = new HashSet<String>();
-		for (Group group : getGroups()) {
-			group.getEffectiveParents().forEach((parent) -> {
-				effective.addAll(parent.getPermissions(category));
-			});
-		}
-		this.effective.put(category, Collections.unmodifiableSet(effective));
+		// gets all the groups, including parents and superparents, this User is in
+		Set<Group> groups = new HashSet<Group>();
+		getGroups().forEach((group) -> group.getEffectiveParents().forEach(groups::add));
+		
+		// gets the effective permissions for this User in the specified category
+		Set<String> effective = this.effective.computeIfAbsent(category, (c) -> ConcurrentHashMap.newKeySet());
+		
+		groups.forEach((group) -> effective.addAll(group.getPermissions(category)));
 	}
 	
 	@Override

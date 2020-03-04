@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.jdt.annotation.Nullable;
 
+import space.arim.universal.util.proxy.DynamicUnmodifiableCollection;
+
 import space.arim.perms.api.Group;
 
 public class GroupInfo implements Group {
@@ -36,6 +38,7 @@ public class GroupInfo implements Group {
 	private volatile Set<Group> parentsView;
 	
 	private final ConcurrentHashMap<String, Set<String>> permissions = new ConcurrentHashMap<String, Set<String>>();
+	private final ConcurrentHashMap<String, Collection<String>> permissionsView = new ConcurrentHashMap<String, Collection<String>>();
 	private volatile Set<String> categoriesView;
 	
 	private volatile Set<Group> effective;
@@ -61,19 +64,19 @@ public class GroupInfo implements Group {
 	
 	/**
 	 * Directly gets the permissions of the group for the category. <br>
-	 * May return <code>null</code> if not set.
+	 * Rather than returning <code>null</code>, an empty set is returned if
+	 * there are no permissions set for the category specified.
 	 * 
 	 * @param category the category
 	 * @return the permissions for that category
 	 */
-	@Nullable
 	Set<String> getMutablePerms(@Nullable String category) {
-		return permissions.get(category);
+		return permissions.getOrDefault(category, Collections.emptySet());
 	}
 	
 	@Override
 	public Collection<String> getPermissions(@Nullable String category) {
-		return Collections.unmodifiableSet(permissions.getOrDefault(category, Collections.emptySet()));
+		return permissionsView.computeIfAbsent(category, (cat) -> new DynamicUnmodifiableCollection<String>(() -> getMutablePerms(cat)));
 	}
 	
 	@Override
