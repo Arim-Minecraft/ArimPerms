@@ -25,7 +25,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import space.arim.api.util.ConciseLogFormatter;
+import space.arim.api.util.log.ConciseLogFormatter;
 import space.arim.api.util.FilesUtil;
 
 import space.arim.perms.api.ArimPerms;
