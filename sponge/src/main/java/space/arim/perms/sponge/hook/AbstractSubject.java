@@ -34,7 +34,7 @@ public abstract class AbstractSubject implements Subject {
 	AbstractSubject(SpongeHook hook, SubjectCollection collection) {
 		this.hook = hook;
 		this.collection = collection;
-		reference = new SimpleSubjectReference(hook, getContainingCollection(), getIdentifier());
+		reference = hook.getSubjectReference(getContainingCollection().getIdentifier(), getIdentifier());
 	}
 	
 	@Override

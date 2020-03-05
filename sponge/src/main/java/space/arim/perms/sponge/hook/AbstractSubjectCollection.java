@@ -140,7 +140,7 @@ public abstract class AbstractSubjectCollection implements SubjectCollection {
 	
 	@Override
 	public SubjectReference newSubjectReference(String subjectIdentifier) {
-		return new SimpleSubjectReference(hook, this, subjectIdentifier);
+		return hook.getSubjectReference(id, subjectIdentifier);
 	}
 	
 	@Override
