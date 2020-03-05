@@ -18,15 +18,18 @@
  */
 package space.arim.perms.sponge.hook;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -47,28 +50,34 @@ public class SpongeHook implements PermissionService {
 	final ArimPerms core;
 	private final Set<ContextCalculator<Subject>> calculators = ConcurrentHashMap.newKeySet();
 	
-	private final SubjectCollection groups;
-	private final SubjectCollection users;
-	private volatile Map<String, SubjectCollection> collMap;
+	private final BlankDefaultSubjectCollection blankColl;
+	private final SubjectCollection groupsColl;
+	private final SubjectCollection usersColl;
+	private final Map<String, SubjectCollection> collMap;
+	private final Set<String> allIdentifiers;
 	
 	public SpongeHook(ArimPerms core) {
 		this.core = core;
-		groups = null;
-		users = null;
-	}
-	
-	private Map<String, SubjectCollection> getCollMap() {
-		if (collMap == null) {
-			Map<String, SubjectCollection> map = new HashMap<String, SubjectCollection>();
-			map.put(SUBJECTS_GROUP, groups);
-			map.put(SUBJECTS_USER, users);
-			collMap = Collections.unmodifiableMap(map);
-		}
-		return collMap;
+		blankColl = new BlankDefaultSubjectCollection(this);
+		groupsColl = new GroupsCollection(this);
+		usersColl = new UsersCollection(this);
+		Map<String, SubjectCollection> collMap = new HashMap<String, SubjectCollection>();
+		collMap.put(SUBJECTS_GROUP, groupsColl);
+		collMap.put(SUBJECTS_USER, usersColl);
+		this.collMap = Collections.unmodifiableMap(collMap);
+		allIdentifiers = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(blankColl.getIdentifier(), groupsColl.getIdentifier(), usersColl.getIdentifier())));
 	}
 	
 	AsyncExecution getExecutor() {
 		return core.getRegistry().getRegistration(AsyncExecution.class);
+	}
+	
+	<T> CompletableFuture<T> completed(T value) {
+		return CompetitiveFuture.completed(value, getExecutor());
+	}
+	
+	<T> CompletableFuture<T> supply(Supplier<T> supplier) {
+		return CompetitiveFuture.supplyAsync(supplier, getExecutor());
 	}
 	
 	@Override
@@ -78,31 +87,33 @@ public class SpongeHook implements PermissionService {
 	
 	@Override
 	public SubjectCollection getGroupSubjects() {
-		return groups;
+		return groupsColl;
 	}
 	
 	@Override
 	public SubjectCollection getUserSubjects() {
-		return users;
+		return usersColl;
 	}
 	
 	@Override
 	public CompletableFuture<Set<String>> getAllIdentifiers() {
-		return CompetitiveFuture.completed(getCollMap().keySet(), getExecutor());
+		return completed(allIdentifiers);
 	}
 	
 	@Override
 	public Map<String, SubjectCollection> getLoadedCollections() {
-		return getCollMap();
+		return collMap;
 	}
 	
 	@Override
 	public Optional<SubjectCollection> getCollection(String identifier) {
 		switch (identifier) {
+		case SUBJECTS_DEFAULT:
+			return Optional.of(blankColl);
 		case SUBJECTS_GROUP:
-			return Optional.of(groups);
+			return Optional.of(groupsColl);
 		case SUBJECTS_USER:
-			return Optional.of(users);
+			return Optional.of(usersColl);
 		default:
 			return Optional.empty();
 		}
@@ -110,7 +121,7 @@ public class SpongeHook implements PermissionService {
 	
 	@Override
 	public Subject getDefaults() {
-		return null;
+		return blankColl.getSubject();
 	}
 	
 	@Override
@@ -130,22 +141,26 @@ public class SpongeHook implements PermissionService {
 	
 	@Override
 	public CompletableFuture<Boolean> hasCollection(String identifier) {
-		return CompetitiveFuture.completed(getCollection(identifier).isPresent(), getExecutor());
+		return completed(getCollection(identifier).isPresent());
 	}
 	
 	@Override
 	public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
-		return CompetitiveFuture.completed(getCollection(identifier).get(), getExecutor());
+		return supply(() -> getCollection(identifier).get());
 	}
 	
 	@Override
 	public Builder newDescriptionBuilder(Object plugin) {
-		return null;
+		return new BlankDescriptionBuilder(this);
+	}
+	
+	SubjectReference getSubjectReference(String collId, String subjId) {
+		return new SimpleSubjectReference(this, collId, subjId);
 	}
 	
 	@Override
 	public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier) {
-		return null;
+		return getSubjectReference(collectionIdentifier, subjectIdentifier);
 	}
 	
 }

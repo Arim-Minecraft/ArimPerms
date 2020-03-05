@@ -21,7 +21,6 @@ package space.arim.perms.sponge.hook;
 import java.util.concurrent.CompletableFuture;
 
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
 
 public class SimpleSubjectReference implements SubjectReference {
@@ -30,9 +29,9 @@ public class SimpleSubjectReference implements SubjectReference {
 	private final String collId;
 	private final String subjId;
 	
-	SimpleSubjectReference(SpongeHook hook, SubjectCollection collection, String subjId) {
+	SimpleSubjectReference(SpongeHook hook, String collId, String subjId) {
 		this.hook = hook;
-		collId = collection.getIdentifier();
+		this.collId = collId;
 		this.subjId = subjId;
 	}
 	
@@ -49,6 +48,24 @@ public class SimpleSubjectReference implements SubjectReference {
 	@Override
 	public CompletableFuture<Subject> resolve() {
 		return hook.supply(() -> hook.getCollection(getCollectionIdentifier()).get().getSubject(getSubjectIdentifier()).get());
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((collId == null) ? 0 : collId.hashCode());
+		result = prime * result + ((subjId == null) ? 0 : subjId.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if (object instanceof SubjectReference) {
+			SubjectReference other = (SubjectReference) object;
+			return getCollectionIdentifier().equals(other.getCollectionIdentifier()) && getSubjectIdentifier().equals(other.getSubjectIdentifier());
+		}
+		return false;
 	}
 
 }
