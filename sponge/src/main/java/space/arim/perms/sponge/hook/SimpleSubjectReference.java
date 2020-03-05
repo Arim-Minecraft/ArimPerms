@@ -24,33 +24,31 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
 
-import space.arim.universal.util.concurrent.CompetitiveFuture;
-
-public class SubjRef implements SubjectReference {
+public class SimpleSubjectReference implements SubjectReference {
 
 	private final SpongeHook hook;
 	private final String collId;
-	private final Subject subject;
+	private final String subjId;
 	
-	SubjRef(SpongeHook hook, SubjectCollection collection, Subject subject) {
+	SimpleSubjectReference(SpongeHook hook, SubjectCollection collection, String subjId) {
 		this.hook = hook;
 		collId = collection.getIdentifier();
-		this.subject = subject;
+		this.subjId = subjId;
 	}
 	
 	@Override
 	public String getCollectionIdentifier() {
 		return collId;
 	}
-
+	
 	@Override
 	public String getSubjectIdentifier() {
-		return subject.getIdentifier();
+		return subjId;
 	}
 	
 	@Override
 	public CompletableFuture<Subject> resolve() {
-		return CompetitiveFuture.completed(subject, hook.getExecutor());
+		return hook.supply(() -> hook.getCollection(getCollectionIdentifier()).get().getSubject(getSubjectIdentifier()).get());
 	}
 
 }
