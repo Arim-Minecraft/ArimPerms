@@ -20,11 +20,14 @@ package space.arim.perms.sponge.hook;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.spongepowered.api.service.permission.Subject;
 import space.arim.perms.api.Permissible;
 
 public abstract class AbstractPermissibleSubjectCollection<T extends Permissible> extends AbstractSubjectCollection {
+	
+	private final ConcurrentHashMap<T, Subject> cache = new ConcurrentHashMap<T, Subject>();
 	
 	AbstractPermissibleSubjectCollection(SpongeHook hook, String id) {
 		super(hook, id);
@@ -32,7 +35,11 @@ public abstract class AbstractPermissibleSubjectCollection<T extends Permissible
 	
 	abstract Collection<T> getPermissibles();
 	
-	abstract Subject convert(T permissible);
+	abstract Subject convertFresh(T permissible);
+	
+	private Subject convert(T permissible) {
+		return cache.computeIfAbsent(permissible, this::convertFresh);
+	}
 	
 	@Override
 	public Collection<Subject> getLoadedSubjects() {
