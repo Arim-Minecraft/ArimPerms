@@ -51,8 +51,8 @@ public class SpongeHook implements PermissionService {
 	private final Set<ContextCalculator<Subject>> calculators = ConcurrentHashMap.newKeySet();
 	
 	private final BlankDefaultSubjectCollection blankColl;
-	private final SubjectCollection groupsColl;
-	private final SubjectCollection usersColl;
+	private final GroupsCollection groupsColl;
+	private final UsersCollection usersColl;
 	private final Map<String, SubjectCollection> collMap;
 	private final Set<String> allIdentifiers;
 	
@@ -86,12 +86,12 @@ public class SpongeHook implements PermissionService {
 	}
 	
 	@Override
-	public SubjectCollection getGroupSubjects() {
+	public GroupsCollection getGroupSubjects() {
 		return groupsColl;
 	}
 	
 	@Override
-	public SubjectCollection getUserSubjects() {
+	public UsersCollection getUserSubjects() {
 		return usersColl;
 	}
 	
