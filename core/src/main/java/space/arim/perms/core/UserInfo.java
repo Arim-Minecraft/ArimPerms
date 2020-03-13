@@ -30,11 +30,11 @@ import space.arim.perms.api.Group;
 import space.arim.perms.api.User;
 
 public class UserInfo implements User {
-
+	
 	private final String id;
 	
 	private final Set<Group> groups = ConcurrentHashMap.newKeySet();
-	private Set<Group> groupsView;
+	private volatile Set<Group> groupsView;
 	
 	private final ConcurrentHashMap<String, Set<String>> effective = new ConcurrentHashMap<String, Set<String>>();
 	
@@ -88,10 +88,9 @@ public class UserInfo implements User {
 		Set<Group> groups = new HashSet<Group>();
 		getGroups().forEach((group) -> group.getEffectiveParents().forEach(groups::add));
 		
-		// gets the effective permissions for this User in the specified category
-		Set<String> effective = this.effective.computeIfAbsent(category, (c) -> ConcurrentHashMap.newKeySet());
-		
-		groups.forEach((group) -> effective.addAll(group.getPermissions(category)));
+		Set<String> permissions = ConcurrentHashMap.newKeySet();
+		groups.forEach((group) -> permissions.addAll(group.getPermissions(category)));
+		effective.put(category, permissions);
 	}
 	
 	@Override
