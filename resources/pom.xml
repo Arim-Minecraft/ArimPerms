@@ -12,6 +12,7 @@
 	<artifactId>perms-resources</artifactId>
 	<name>ArimPerms-resources</name>
 	<description>Config.yml for ArimPerms.</description>
+	<packaging>pom</packaging>
 	
 	<build>
 		<finalName>${project.name}_v${core.version}</finalName>
