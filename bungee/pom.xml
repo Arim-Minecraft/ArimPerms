@@ -10,7 +10,7 @@
 	</parent>
 	
 	<artifactId>perms-bungee</artifactId>
-	<name>ArimPerms-Bungee</name>
+	<name>ArimPerms-bungee</name>
 	<description>BungeeCord plugin for ArimPerms.</description>
 	
 	<build>
