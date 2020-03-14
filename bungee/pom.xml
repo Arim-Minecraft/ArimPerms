@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>space.arim</groupId>
 		<artifactId>perms</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
+		<version>0.2.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>perms-bungee</artifactId>
@@ -78,15 +78,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>space.arim</groupId>
-			<artifactId>perms-resources</artifactId>
+			<artifactId>universal-gpl</artifactId>
 			<type>zip</type>
+			<optional>true</optional>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>space.arim</groupId>
-			<artifactId>universal-gpl</artifactId>
+			<artifactId>perms-resources</artifactId>
 			<type>zip</type>
-			<optional>true</optional>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
