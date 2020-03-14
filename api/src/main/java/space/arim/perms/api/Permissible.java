@@ -26,7 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
  * <b>Specifications</b>: <br>
  * * {@link #getId()} must return a unique ID. <br>
  * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code> <br>
- * * <code>{@link #hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> 
+ * * <code>{@link Object#hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code>
  * 
  * @author A248
  *

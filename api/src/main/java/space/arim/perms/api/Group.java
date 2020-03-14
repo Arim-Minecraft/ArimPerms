@@ -31,7 +31,7 @@ import space.arim.universal.util.collections.CollectionsUtil;
  * <b>Specifications</b>: <br>
  * * {@link #getId()} must return a unique group ID. <br>
  * * <code>#equals(Object object)</code> <b>MUST</b> be overriden <b>AND</b> check for equivalency using <code>#getId()</code> <br>
- * * <code>{@link #hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> <br>
+ * * <code>{@link Object#hashCode()}</code> should likewise be overriden and implemented based on <code>#getId()</code> <br>
  * * {@link #hasPermission(String, String)} should check whether the group has the permission ONLY for the category provided.
  * It should NOT determine whether the group has permission for the category or the general category.
  * 
@@ -58,7 +58,7 @@ public interface Group extends Permissible {
 	/**
 	 * Adds another group as a parent of this one.
 	 * 
-	 * @param group the group to add as a parent
+	 * @param parent the group to add as a parent
 	 * @return false if this group already has the specified group as a parent, true otherwise
 	 */
 	boolean addParent(Group parent);
@@ -66,7 +66,7 @@ public interface Group extends Permissible {
 	/**
 	 * Removes another group as a parent of this one.
 	 * 
-	 * @param group the group to remove as a parent
+	 * @param parent the group to remove as a parent
 	 * @return false if this group did not have the specified group as a parent, true otherwise
 	 */
 	boolean removeParent(Group parent);
@@ -124,7 +124,7 @@ public interface Group extends Permissible {
 	/**
 	 * Adds all permissions to the group
 	 * 
-	 * @param category the category
+	 * @param permissions the permissions to add
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	default boolean addPermissions(Collection<String> permissions) {
@@ -135,7 +135,7 @@ public interface Group extends Permissible {
 	 * Adds all permissions to the group with optional category
 	 * 
 	 * @param category the category
-	 * @param permissions the permissions
+	 * @param permissions the permissions to add
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	boolean addPermissions(@Nullable String category, Collection<String> permissions);
@@ -185,7 +185,7 @@ public interface Group extends Permissible {
 	/**
 	 * Removes all specified permissions from the group
 	 * 
-	 * @param permission the permission
+	 * @param permissions the permissions to remove
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	default boolean removePermissions(Collection<String> permissions) {
@@ -196,7 +196,7 @@ public interface Group extends Permissible {
 	 * Removes all specified permissions from the group with optional category
 	 * 
 	 * @param category the category
-	 * @param permissions the permissions
+	 * @param permissions the permissions to remove
 	 * @return true if and only if the group's permissions changed as a result of the call
 	 */
 	boolean removePermissions(@Nullable String category, Collection<String> permissions);
